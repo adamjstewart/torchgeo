@@ -410,6 +410,7 @@ SpaceNet
 .. autoclass:: SpaceNet5
 .. autoclass:: SpaceNet6
 .. autoclass:: SpaceNet7
+.. autoclass:: SpaceNet8
 
 SSL4EO
 ^^^^^^
