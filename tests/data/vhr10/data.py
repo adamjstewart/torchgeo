@@ -4,7 +4,6 @@
 import json
 import os
 import shutil
-import subprocess
 
 import numpy as np
 from PIL import Image
