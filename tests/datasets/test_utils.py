@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-import glob
 import math
 import os
 import pickle
@@ -26,8 +25,6 @@ from torchgeo.datasets.utils import (
     concat_samples,
     disambiguate_timestamp,
     download_and_extract_archive,
-    download_radiant_mlhub_collection,
-    download_radiant_mlhub_dataset,
     extract_archive,
     lazy_import,
     merge_samples,
@@ -37,32 +34,6 @@ from torchgeo.datasets.utils import (
     which,
     working_dir,
 )
-
-
-class MLHubDataset:
-    def download(self, output_dir: str, **kwargs: str) -> None:
-        glob_path = os.path.join(
-            'tests', 'data', 'ref_african_crops_kenya_02', '*.tar.gz'
-        )
-        for tarball in glob.iglob(glob_path):
-            shutil.copy(tarball, output_dir)
-
-
-class Collection:
-    def download(self, output_dir: str, **kwargs: str) -> None:
-        glob_path = os.path.join(
-            'tests', 'data', 'ref_african_crops_kenya_02', '*.tar.gz'
-        )
-        for tarball in glob.iglob(glob_path):
-            shutil.copy(tarball, output_dir)
-
-
-def fetch_dataset(dataset_id: str, **kwargs: str) -> MLHubDataset:
-    return MLHubDataset()
-
-
-def fetch_collection(collection_id: str, **kwargs: str) -> Collection:
-    return Collection()
 
 
 def download_url(url: str, root: str | Path, *args: str) -> None:
@@ -100,22 +71,6 @@ def test_download_and_extract_archive(tmp_path: Path, monkeypatch: MonkeyPatch) 
     download_and_extract_archive(
         os.path.join('tests', 'data', 'landcoverai', 'landcover.ai.v1.zip'), tmp_path
     )
-
-
-def test_download_radiant_mlhub_dataset(
-    tmp_path: Path, monkeypatch: MonkeyPatch
-) -> None:
-    radiant_mlhub = pytest.importorskip('radiant_mlhub', minversion='0.3')
-    monkeypatch.setattr(radiant_mlhub.Dataset, 'fetch', fetch_dataset)
-    download_radiant_mlhub_dataset('', tmp_path)
-
-
-def test_download_radiant_mlhub_collection(
-    tmp_path: Path, monkeypatch: MonkeyPatch
-) -> None:
-    radiant_mlhub = pytest.importorskip('radiant_mlhub', minversion='0.3')
-    monkeypatch.setattr(radiant_mlhub.Collection, 'fetch', fetch_collection)
-    download_radiant_mlhub_collection('', tmp_path)
 
 
 class TestBoundingBox:
