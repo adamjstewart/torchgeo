@@ -15,8 +15,6 @@ from pytest import MonkeyPatch
 import torchgeo.datasets.utils
 from torchgeo.datasets import RESISC45, DatasetNotFoundError
 
-pytest.importorskip('rarfile', minversion='4')
-
 
 def download_url(url: str, root: str | Path, *args: str, **kwargs: str) -> None:
     shutil.copy(url, root)
@@ -28,9 +26,9 @@ class TestRESISC45:
         self, monkeypatch: MonkeyPatch, tmp_path: Path, request: SubRequest
     ) -> RESISC45:
         monkeypatch.setattr(torchgeo.datasets.resisc45, 'download_url', download_url)
-        md5 = '5895dea3757ba88707d52f5521c444d3'
+        md5 = '4a35f5218e5867e98bd46f3259546b37'
         monkeypatch.setattr(RESISC45, 'md5', md5)
-        url = os.path.join('tests', 'data', 'resisc45', 'NWPU-RESISC45.rar')
+        url = os.path.join('tests', 'data', 'resisc45', 'NWPU-RESISC45.zip')
         monkeypatch.setattr(RESISC45, 'url', url)
         monkeypatch.setattr(
             RESISC45,

@@ -39,22 +39,6 @@ __all__ = ('check_integrity', 'download_url')
 Path: TypeAlias = str | pathlib.Path
 
 
-class _rarfile:
-    class RarFile:
-        def __init__(self, *args: Any, **kwargs: Any) -> None:
-            self.args = args
-            self.kwargs = kwargs
-
-        def __enter__(self) -> Any:
-            rarfile = lazy_import('rarfile')
-            # TODO: catch exception for when rarfile is installed but not
-            # unrar/unar/bsdtar
-            return rarfile.RarFile(*self.args, **self.kwargs)
-
-        def __exit__(self, exc_type: None, exc_value: None, traceback: None) -> None:
-            pass
-
-
 class _zipfile:
     class ZipFile:
         def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -90,7 +74,6 @@ def extract_archive(src: Path, dst: Path | None = None) -> None:
         dst = os.path.dirname(src)
 
     suffix_and_extractor: list[tuple[str | tuple[str, ...], Any]] = [
-        ('.rar', _rarfile.RarFile),
         (
             ('.tar', '.tar.gz', '.tar.bz2', '.tar.xz', '.tgz', '.tbz2', '.tbz', '.txz'),
             tarfile.open,
