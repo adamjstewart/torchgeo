@@ -10,6 +10,13 @@ from torchgeo.datasets.utils import Executable, which
 
 
 @pytest.fixture
+def aws(monkeypatch: MonkeyPatch) -> Executable:
+    path = os.path.dirname(os.path.realpath(__file__))
+    monkeypatch.setenv('PATH', path, prepend=os.pathsep)
+    return which('aws')
+
+
+@pytest.fixture
 def azcopy(monkeypatch: MonkeyPatch) -> Executable:
     path = os.path.dirname(os.path.realpath(__file__))
     monkeypatch.setenv('PATH', path, prepend=os.pathsep)
