@@ -80,7 +80,7 @@ class TestBYOLTask:
             '1',
         ]
 
-        main(['fit'] + args)
+        main(['fit', *args])
 
     @pytest.fixture
     def weights(self) -> WeightsEnum:

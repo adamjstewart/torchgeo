@@ -107,9 +107,9 @@ class RESISC45(NonGeoClassificationDataset):
 
     splits = ['train', 'val', 'test']
     split_urls = {
-        'train': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-train.txt',  # noqa: E501
-        'val': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-val.txt',  # noqa: E501
-        'test': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-test.txt',  # noqa: E501
+        'train': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-train.txt',
+        'val': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-val.txt',
+        'test': 'https://storage.googleapis.com/remote_sensing_representations/resisc45-test.txt',
     }
     split_md5s = {
         'train': 'b5a4c05a37de15e4ca886696a85c403e',

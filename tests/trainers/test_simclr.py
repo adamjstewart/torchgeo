@@ -69,7 +69,7 @@ class TestSimCLRTask:
             '1',
         ]
 
-        main(['fit'] + args)
+        main(['fit', *args])
 
     def test_version_warnings(self) -> None:
         with pytest.warns(UserWarning, match='SimCLR v1 only uses 2 layers'):

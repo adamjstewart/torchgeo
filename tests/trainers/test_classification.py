@@ -109,13 +109,13 @@ class TestClassificationTask:
             '1',
         ]
 
-        main(['fit'] + args)
+        main(['fit', *args])
         try:
-            main(['test'] + args)
+            main(['test', *args])
         except MisconfigurationException:
             pass
         try:
-            main(['predict'] + args)
+            main(['predict', *args])
         except MisconfigurationException:
             pass
 
@@ -262,13 +262,13 @@ class TestMultiLabelClassificationTask:
             '1',
         ]
 
-        main(['fit'] + args)
+        main(['fit', *args])
         try:
-            main(['test'] + args)
+            main(['test', *args])
         except MisconfigurationException:
             pass
         try:
-            main(['predict'] + args)
+            main(['predict', *args])
         except MisconfigurationException:
             pass
 
