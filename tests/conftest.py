@@ -1,6 +1,7 @@
 # Copyright (c) TorchGeo Contributors. All rights reserved.
 # Licensed under the MIT License.
 
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +32,6 @@ def torch_hub(tmp_path: Path) -> None:
 
 
 @pytest.fixture(autouse=True, scope='session')
-def torch_inference_mode() -> None:
+def torch_inference_mode() -> Iterator[None]:
     with torch.inference_mode():
         yield
