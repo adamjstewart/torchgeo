@@ -33,5 +33,5 @@ def torch_hub(tmp_path: Path) -> None:
 
 @pytest.fixture(autouse=True, scope='session')
 def torch_no_grad() -> Iterator[None]:
-    with torch.no_grade():
+    with torch.no_grad():
         yield
