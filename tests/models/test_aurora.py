@@ -42,7 +42,6 @@ class TestAurora:
         aurora_swin_unet(weights=weights)
 
     @pytest.mark.slow
-    @torch.inference_mode()
     def test_aurora_prediction(self, weights: WeightsEnum) -> None:
         from aurora import Batch, Metadata
 

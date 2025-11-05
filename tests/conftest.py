@@ -28,3 +28,9 @@ def matplotlib_backend() -> None:
 @pytest.fixture(autouse=True)
 def torch_hub(tmp_path: Path) -> None:
     torch.hub.set_dir(tmp_path)
+
+
+@pytest.fixture(autouse=True, scope='session')
+def torch_inference_mode() -> None:
+    with torch.inference_mode():
+        yield

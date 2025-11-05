@@ -35,7 +35,6 @@ class TestEarthLoc:
         monkeypatch.setattr(weights.value, 'url', str(path))
         return weights
 
-    @torch.inference_mode()
     def test_earthloc(self) -> None:
         earthloc()
 

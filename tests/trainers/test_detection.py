@@ -135,5 +135,4 @@ class TestObjectDetectionTask:
         )
         model.eval()
         sample = [torch.randn(in_channels, 224, 224)]
-        with torch.inference_mode():
-            model(sample)
+        model(sample)

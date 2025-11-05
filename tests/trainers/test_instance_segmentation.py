@@ -130,5 +130,4 @@ class TestInstanceSegmentationTask:
         model = InstanceSegmentationTask(in_channels=in_channels, num_classes=2)
         model.eval()
         sample = [torch.randn(in_channels, 224, 224)]
-        with torch.inference_mode():
-            model(sample)
+        model(sample)
