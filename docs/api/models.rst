@@ -13,7 +13,7 @@ Model Architectures
 
    models/aurora
    models/btc
-   models/change-star
+   models/changestar
    models/changevit
    models/conv-lstm
    models/copernicus-fm
