@@ -215,12 +215,7 @@ class GlobBiomass(RasterDataset):
         mask = torch.cat((mask, std_err_mask), dim=0)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample = {
-            'mask': mask,
-            'crs': self.crs,
-            'bounds': query,
-            'transform': torch.tensor(transform),
-        }
+        sample = {'mask': mask, 'transform': torch.tensor(transform)}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

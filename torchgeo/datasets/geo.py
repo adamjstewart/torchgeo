@@ -538,11 +538,7 @@ class RasterDataset(GeoDataset):
             data = self._merge_files(index.filepath, query, self.band_indexes)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample: dict[str, Any] = {
-            'crs': self.crs,
-            'bounds': query,
-            'transform': torch.tensor(transform),
-        }
+        sample: dict[str, Any] = {'transform': torch.tensor(transform)}
 
         data = data.to(self.dtype)
         if self.is_image:
@@ -748,12 +744,7 @@ class XarrayDataset(GeoDataset):
 
         image = self._merge_files(index.filepath, query)
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample: dict[str, Any] = {
-            'crs': self.crs,
-            'bounds': query,
-            'image': image,
-            'transform': torch.tensor(transform),
-        }
+        sample: dict[str, Any] = {'image': image, 'transform': torch.tensor(transform)}
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -1059,11 +1050,7 @@ class VectorDataset(GeoDataset):
             labels = np.empty((0,), dtype=np.int32)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample: dict[str, Any] = {
-            'crs': self.crs,
-            'bounds': query,
-            'transform': torch.tensor(transform),
-        }
+        sample: dict[str, Any] = {'transform': torch.tensor(transform)}
 
         # Use array_to_tensor since rasterize may return uint16/uint32 arrays.
         match self.task:

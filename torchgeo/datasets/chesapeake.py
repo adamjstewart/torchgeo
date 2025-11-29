@@ -519,8 +519,6 @@ class ChesapeakeCVPR(GeoDataset):
         sample: dict[str, Any] = {
             'image': [],
             'mask': [],
-            'crs': self.crs,
-            'bounds': query,
             'transform': torch.tensor(transform),
         }
 
