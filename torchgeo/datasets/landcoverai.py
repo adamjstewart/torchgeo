@@ -269,8 +269,8 @@ class LandCoverAIGeo(LandCoverAIBase, RasterDataset):
                 f'query: {query} not found in index with bounds: {self.bounds}'
             )
 
-        img = self._merge_files(img_filepaths, query, self.band_indexes)
-        mask = self._merge_files(mask_filepaths, query, self.band_indexes)
+        img = self._merge_or_stack(img_filepaths, query, self.band_indexes)
+        mask = self._merge_or_stack(mask_filepaths, query, self.band_indexes)
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
         sample = {
             'crs': self.crs,

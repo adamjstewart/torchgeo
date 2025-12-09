@@ -213,7 +213,7 @@ class AgriFieldNet(RasterDataset):
                         filename = filename[:start] + band + filename[end:]
                 filepath = os.path.join(directory, filename)
                 band_filepaths.append(filepath)
-            data_list.append(self._merge_files(band_filepaths, query))
+            data_list.append(self._merge_or_stack(band_filepaths, query))
         image = torch.cat(data_list)
 
         mask_filepaths = []
@@ -223,7 +223,7 @@ class AgriFieldNet(RasterDataset):
                     file_path = os.path.join(root, file)
                     mask_filepaths.append(file_path)
 
-        mask = self._merge_files(mask_filepaths, query)
+        mask = self._merge_or_stack(mask_filepaths, query)
         mask = self.ordinal_map[mask.squeeze().long()]
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)

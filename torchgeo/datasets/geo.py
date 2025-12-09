@@ -21,6 +21,7 @@ import pandas as pd
 import pyproj
 import rasterio
 import rasterio.merge
+import rasterio.stack
 import shapely
 import torch
 from geopandas import GeoDataFrame
@@ -403,6 +404,7 @@ class RasterDataset(GeoDataset):
         bands: Sequence[str] | None = None,
         transforms: Callable[[dict[str, Any]], dict[str, Any]] | None = None,
         cache: bool = True,
+        time_series: bool = False,
     ) -> None:
         """Initialize a new RasterDataset instance.
 
@@ -416,10 +418,15 @@ class RasterDataset(GeoDataset):
             transforms: a function/transform that takes an input sample
                 and returns a transformed version
             cache: if True, cache file handle to speed up repeated sampling
+            time_series: if True, stack data along the time series dimension
+                [T, C, H, W]. If False, merge data into a [C, H, W] mosaic.
 
         Raises:
             AssertionError: If *bands* are invalid.
             DatasetNotFoundError: If dataset is not found.
+
+        .. versionadded:: 0.9
+           The *time_series* parameter.
 
         .. versionchanged:: 0.5
            *root* was renamed to *paths*.
@@ -428,6 +435,7 @@ class RasterDataset(GeoDataset):
         self.bands = bands or self.all_bands
         self.transforms = transforms
         self.cache = cache
+        self.time_series = time_series
 
         if self.all_bands:
             assert set(self.bands) <= set(self.all_bands)
@@ -533,10 +541,10 @@ class RasterDataset(GeoDataset):
                 for filepath in index.filepath:
                     filepath = self._update_filepath(band, filepath)
                     band_filepaths.append(filepath)
-                data_list.append(self._merge_files(band_filepaths, query))
+                data_list.append(self._merge_or_stack(band_filepaths, query))
             data = torch.cat(data_list)
         else:
-            data = self._merge_files(index.filepath, query, self.band_indexes)
+            data = self._merge_or_stack(index.filepath, query, self.band_indexes)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
         sample: dict[str, Any] = {
@@ -549,7 +557,7 @@ class RasterDataset(GeoDataset):
         if self.is_image:
             sample['image'] = data
         else:
-            sample['mask'] = data.squeeze(0)
+            sample['mask'] = data.squeeze(-3)
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -577,13 +585,16 @@ class RasterDataset(GeoDataset):
         filepath = os.path.join(directory, filename)
         return filepath
 
-    def _merge_files(
+    def _merge_or_stack(
         self,
         filepaths: Sequence[str],
         query: GeoSlice,
         band_indexes: Sequence[int] | None = None,
     ) -> Tensor:
-        """Load and merge one or more files.
+        """Load and combine one or more files.
+
+        If *time_series* is True, files are stacked into a [T, C, H, W] shape.
+        If *time_series* is False, files are merged into a [C, H, W] mosaic.
 
         Args:
             filepaths: one or more files to load and merge
@@ -601,7 +612,12 @@ class RasterDataset(GeoDataset):
         x, y, _ = self._disambiguate_slice(query)
         bounds = (x.start, y.start, x.stop, y.stop)
         res = (x.step, y.step)
-        dest, _ = rasterio.merge.merge(
+        if self.time_series:
+            combine = rasterio.stack.stack
+        else:
+            combine = rasterio.merge.merge
+
+        dest, _ = combine(
             vrt_fhs, bounds, res, indexes=band_indexes, resampling=self.resampling
         )
         # Use array_to_tensor since merge may return uint16/uint32 arrays.

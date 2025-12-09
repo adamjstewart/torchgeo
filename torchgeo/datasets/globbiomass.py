@@ -207,10 +207,10 @@ class GlobBiomass(RasterDataset):
                 f'query: {query} not found in index with bounds: {self.bounds}'
             )
 
-        mask = self._merge_files(index.filepath, query)
+        mask = self._merge_or_stack(index.filepath, query)
 
         std_error_paths = index.filepath.apply(lambda x: x.replace('.tif', '_err.tif'))
-        std_err_mask = self._merge_files(std_error_paths, query)
+        std_err_mask = self._merge_or_stack(std_error_paths, query)
 
         mask = torch.cat((mask, std_err_mask), dim=0)
 

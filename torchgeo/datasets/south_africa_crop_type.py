@@ -218,7 +218,7 @@ class SouthAfricaCropType(RasterDataset):
                     f'{field_id}_{date}_{band}_10m.tif',
                 )
                 band_filepaths.append(filepath)
-            data_list.append(self._merge_files(band_filepaths, query))
+            data_list.append(self._merge_or_stack(band_filepaths, query))
         image = torch.cat(data_list)
 
         # Add labels for each field
@@ -229,7 +229,7 @@ class SouthAfricaCropType(RasterDataset):
             )
             mask_filepaths.append(file_path)
 
-        mask = self._merge_files(mask_filepaths, query).squeeze(0)
+        mask = self._merge_or_stack(mask_filepaths, query).squeeze(0)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
         sample = {
