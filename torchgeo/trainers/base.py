@@ -7,8 +7,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Any
 
-import lightning
 from lightning.pytorch import LightningModule
+from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
@@ -53,9 +53,7 @@ class BaseTask(LightningModule, ABC):
     def configure_metrics(self) -> None:
         """Initialize the performance metrics."""
 
-    def configure_optimizers(
-        self,
-    ) -> 'lightning.pytorch.utilities.types.OptimizerLRScheduler':
+    def configure_optimizers(self) -> OptimizerLRScheduler:
         """Initialize the optimizer and learning rate scheduler.
 
         Returns:

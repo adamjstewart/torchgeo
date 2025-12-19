@@ -8,7 +8,6 @@ import warnings
 from typing import Any
 
 import kornia.augmentation as K
-import lightning
 import timm
 import torch
 import torch.nn as nn
@@ -16,6 +15,7 @@ import torch.nn.functional as F
 from lightly.loss import NTXentLoss
 from lightly.models.modules import SimCLRProjectionHead
 from lightly.utils.lars import LARS
+from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torch import Tensor
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from torchvision.models._api import WeightsEnum
@@ -284,9 +284,7 @@ class SimCLRTask(BaseTask):
     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0) -> None:
         """No-op, does nothing."""
 
-    def configure_optimizers(
-        self,
-    ) -> 'lightning.pytorch.utilities.types.OptimizerLRScheduler':
+    def configure_optimizers(self) -> OptimizerLRScheduler:
         """Initialize the optimizer and learning rate scheduler.
 
         .. versionchanged:: 0.6
