@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from typing import Any
 
 import kornia.augmentation as K
+import lightning.pytorch.utilities.types
 import timm
 import torch
 import torch.nn as nn
@@ -17,7 +18,6 @@ from lightly.loss import NTXentLoss
 from lightly.models.modules import MoCoProjectionHead
 from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.utils.scheduler import cosine_schedule
-from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torch import Tensor
 from torch.optim import SGD, AdamW, Optimizer
 from torch.optim.lr_scheduler import (
@@ -287,7 +287,9 @@ class MoCoTask(BaseTask):
                 self.hparams['gather_distributed'],
             )
 
-    def configure_optimizers(self) -> OptimizerLRScheduler:
+    def configure_optimizers(
+        self,
+    ) -> 'lightning.pytorch.utilities.types.OptimizerLRScheduler':
         """Initialize the optimizer and learning rate scheduler.
 
         Returns:

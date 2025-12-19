@@ -5,8 +5,8 @@
 
 from typing import Any
 
+import lightning.pytorch.utilities.types
 import torch
-from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torch import Tensor
 from torch.optim import SGD
 
@@ -22,7 +22,9 @@ class IOBenchTask(BaseTask):
     def configure_models(self) -> None:
         """No-op."""
 
-    def configure_optimizers(self) -> OptimizerLRScheduler:
+    def configure_optimizers(
+        self,
+    ) -> 'lightning.pytorch.utilities.types.OptimizerLRScheduler':
         """Initialize the optimizer.
 
         Returns:
