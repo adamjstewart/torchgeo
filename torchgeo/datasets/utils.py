@@ -22,7 +22,7 @@ import zipfile
 from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, TypeAlias, cast, overload
+from typing import Any, cast, overload
 
 import numpy as np
 import pandas as pd
@@ -38,12 +38,9 @@ from typing_extensions import deprecated
 
 from .errors import DependencyNotFoundError
 
-# Waiting to upgrade Sphinx before switching to type statement
-GeoSlice: TypeAlias = (  # noqa: UP040
-    slice | tuple[slice] | tuple[slice, slice] | tuple[slice, slice, slice]
-)
-Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
-Sample: TypeAlias = dict[str, Any]  # noqa: UP040
+type GeoSlice = slice | tuple[slice] | tuple[slice, slice] | tuple[slice, slice, slice]
+type Path = str | os.PathLike[str]
+type Sample = dict[str, Any]
 
 
 @deprecated('Use torchgeo.datasets.utils.GeoSlice or shapely.Polygon instead')
