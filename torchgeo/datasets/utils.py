@@ -38,13 +38,35 @@ from typing_extensions import deprecated
 
 from .errors import DependencyNotFoundError
 
-#: [xmin:xmax:xres, ymin:ymax:yres, tmin:tmax:tres] slice to index a GeoDataset
+#: Slice to index a GeoDataset.
+#:
+#: Can handle several different forms, such as:
+#:
+#: .. code-block:: python
+#:    ds[xmin:xmax:xres, ymin:ymax:yres]
+#:    ds[:, :, tmin:tmax:tres]
+#:    ds[xmin:xmax, ymin:ymax, tmin:tmax]
+#:
+#: All values are optional and will default to the spatiotemporal extent of the dataset.
 type GeoSlice = slice | tuple[slice] | tuple[slice, slice] | tuple[slice, slice, slice]
 
-#: Path-like object
+#: Path-like object.
+#:
+#: Most datasets can handle any kind of path-like object,
+#: and some can support a list of paths.
 type Path = str | os.PathLike[str]
 
-#: Sample returned by a GeoDataset
+#: Sample dictionary returned by a GeoDataset.
+#:
+#: Keys typically follow Kornia constants and include common keys like:
+#:
+#: * image: input image
+#: * mask: expected output semantic segmentation mask
+#: * label: expected output classification or regression label
+#: * bbox_xyxy: expected output bounding box in (x1, y1, x2, y2) format
+#: * prediction: predicted output
+#:
+#: Values are usually of type torch.Tensor.
 type Sample = dict[str, Any]
 
 

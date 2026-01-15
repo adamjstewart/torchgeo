@@ -140,9 +140,9 @@ Utilities
 Type Aliases
 ^^^^^^^^^^^^
 
-.. type:: GeoSlice
-.. type:: Path
-.. type:: Sample
+.. autotype:: GeoSlice
+.. autotype:: Path
+.. autotype:: Sample
 
 Collation Functions
 ^^^^^^^^^^^^^^^^^^^
