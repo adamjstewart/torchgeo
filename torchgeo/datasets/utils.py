@@ -38,8 +38,13 @@ from typing_extensions import deprecated
 
 from .errors import DependencyNotFoundError
 
+#: [xmin:xmax:xres, ymin:ymax:yres, tmin:tmax:tres] slice to index a GeoDataset
 type GeoSlice = slice | tuple[slice] | tuple[slice, slice] | tuple[slice, slice, slice]
+
+#: Path-like object
 type Path = str | os.PathLike[str]
+
+#: Sample returned by a GeoDataset
 type Sample = dict[str, Any]
 
 
