@@ -137,6 +137,13 @@ UnionDataset
 Utilities
 ---------
 
+Type Aliases
+^^^^^^^^^^^^
+
+.. type:: GeoSlice
+.. type:: Path
+.. type:: Sample
+
 Collation Functions
 ^^^^^^^^^^^^^^^^^^^
 

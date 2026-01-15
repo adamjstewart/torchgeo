@@ -180,6 +180,9 @@ from .ucmerced import UCMerced
 from .usavars import USAVars
 from .utils import (
     BoundingBox,
+    GeoSlice,
+    Path,
+    Sample,
     concat_samples,
     merge_samples,
     stack_samples,
@@ -292,6 +295,7 @@ __all__ = (
     'ForestDamage',
     'GeoDataset',
     'GeoNRW',
+    'GeoSlice',
     'GlobBiomass',
     'GlobalBuildingMap',
     'GoogleSatelliteEmbedding',
@@ -331,6 +335,7 @@ __all__ = (
     'NonGeoDataset',
     'OpenBuildings',
     'OpenStreetMap',
+    'Path',
     'PatternNet',
     'Potsdam2D',
     'PrestoEmbeddings',
@@ -340,6 +345,7 @@ __all__ = (
     'ReforesTree',
     'RwandaFieldBoundary',
     'SSL4EOLBenchmark',
+    'Sample',
     'SatlasPretrain',
     'SeasoNet',
     'SeasonalContrastS2',
