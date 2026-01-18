@@ -40,7 +40,14 @@ from .errors import DependencyNotFoundError
 
 # Waiting to upgrade Sphinx before switching to type statement
 GeoSlice: TypeAlias = (  # noqa: UP040
-    slice | tuple[slice] | tuple[slice, slice] | tuple[slice, slice, slice]
+    'slice[float, float, float]'
+    | tuple['slice[float, float, float]']
+    | tuple['slice[float, float, float]', 'slice[float, float, float]']
+    | tuple[
+        'slice[float, float, float]',
+        'slice[float, float, float]',
+        'slice[datetime, datetime, int]',
+    ]
 )
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 Sample: TypeAlias = dict[str, Any]  # noqa: UP040
