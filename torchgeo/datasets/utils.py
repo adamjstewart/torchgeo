@@ -42,7 +42,7 @@ from .errors import DependencyNotFoundError
 xyslice: TypeAlias = 'slice[float, float, float]'  # noqa: UP040
 tslice: TypeAlias = 'slice[datetime, datetime, int]'  # noqa: UP040
 GeoSlice: TypeAlias = (  # noqa: UP040
-    xyslice | tuple[xyslice] | tuple[xyslice, xyslice] | tuple[xyslice, xyslice, tslice]
+    'xyslice | tuple[xyslice] | tuple[xyslice, xyslice] | tuple[xyslice, xyslice, tslice]'
 )
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 Sample: TypeAlias = dict[str, Any]  # noqa: UP040
