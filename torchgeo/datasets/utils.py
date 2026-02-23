@@ -41,9 +41,16 @@ from .errors import DependencyNotFoundError
 # Waiting to upgrade Sphinx before switching to type statement
 xyslice: TypeAlias = 'slice[float, float, float]'  # noqa: UP040
 tslice: TypeAlias = 'slice[datetime, datetime, int]'  # noqa: UP040
-GeoSlice: TypeAlias = (  # noqa: UP040
-    'xyslice | tuple[xyslice] | tuple[xyslice, xyslice] | tuple[xyslice, xyslice, tslice]'
-)
+GeoSlice: TypeAlias = """
+    slice[float, float, float]
+    | tuple[slice[float, float, float]]
+    | tuple[slice[float, float, float], slice[float, float, float]]
+    | tuple[
+        slice[float, float, float],
+        slice[float, float, float],
+        slice[datetime, datetime, int],
+    ]
+"""  # noqa: UP040
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 Sample: TypeAlias = dict[str, Any]  # noqa: UP040
 
