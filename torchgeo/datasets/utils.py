@@ -39,16 +39,17 @@ from typing_extensions import deprecated
 from .errors import DependencyNotFoundError
 
 # Waiting to upgrade Sphinx before switching to type statement
-xyslice: TypeAlias = 'slice[float, float, float]'  # noqa: UP040
-tslice: TypeAlias = 'slice[datetime, datetime, int]'  # noqa: UP040
 GeoSlice: TypeAlias = """
-    slice[float, float, float]
-    | tuple[slice[float, float, float]]
-    | tuple[slice[float, float, float], slice[float, float, float]]
+    slice[float | None, float | None, float | None]
+    | tuple[slice[float | None, float | None, float | None]]
     | tuple[
-        slice[float, float, float],
-        slice[float, float, float],
-        slice[datetime, datetime, int],
+        slice[float | None, float | None, float | None],
+        slice[float | None, float | None, float | None]
+    ]
+    | tuple[
+        slice[float | None, float | None, float | None],
+        slice[float | None, float | None, float | None],
+        slice[datetime | None, datetime | None, int | None],
     ]
 """  # noqa: UP040
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
