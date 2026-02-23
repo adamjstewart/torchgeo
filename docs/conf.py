@@ -151,11 +151,7 @@ autodoc_default_options = {
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented'
-autodoc_type_aliases = {
-    'GeoSlice': 'GeoSlice',
-    'Path': 'Path',
-    'Sample': 'Sample',
-}
+autodoc_type_aliases = {'GeoSlice': 'GeoSlice', 'Path': 'Path', 'Sample': 'Sample'}
 
 # sphinx.ext.intersphinx
 intersphinx_mapping = {

@@ -154,6 +154,13 @@ Splitting Functions
 .. autofunction:: roi_split
 .. autofunction:: time_series_split
 
+Type Aliases
+^^^^^^^^^^^^
+
+.. autotype:: GeoSlice
+.. autotype:: Path
+.. autotype:: Sample
+
 Errors
 ------
 
