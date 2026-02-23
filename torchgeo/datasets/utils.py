@@ -25,7 +25,6 @@ from datetime import datetime, timedelta
 from typing import Any, TypeAlias, cast, overload
 
 import numpy as np
-import numpy.typing
 import pandas as pd
 import rasterio
 import shapely.affinity
