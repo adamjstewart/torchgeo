@@ -9,6 +9,7 @@ from __future__ import annotations
 import bz2
 import collections
 import contextlib
+import datetime
 import hashlib
 import importlib
 import os
@@ -21,7 +22,6 @@ import warnings
 import zipfile
 from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from typing import Any, TypeAlias, cast, overload
 
 import numpy as np
@@ -39,7 +39,7 @@ from typing_extensions import deprecated
 from .errors import DependencyNotFoundError
 
 # Waiting to upgrade Sphinx before switching to type statement
-GeoSlice: TypeAlias = 'slice[float | None, float | None, float | None] | tuple[slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None], slice[datetime | None, datetime | None, int | None]]'  # noqa: UP040
+GeoSlice: TypeAlias = 'slice[float | None, float | None, float | None] | tuple[slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None], slice[datetime.datetime | None, datetime.datetime | None, int | None]]'  # noqa: UP040
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 Sample: TypeAlias = dict[str, Any]  # noqa: UP040
 
@@ -58,9 +58,9 @@ class BoundingBox:
     #: northern boundary
     maxy: float
     #: earliest boundary
-    mint: datetime
+    mint: datetime.datetime
     #: latest boundary
-    maxt: datetime
+    maxt: datetime.datetime
 
     def __post_init__(self) -> None:
         """Validate the arguments passed to :meth:`__init__`.
@@ -194,7 +194,7 @@ class BoundingBox:
         return (self.maxx - self.minx) * (self.maxy - self.miny)
 
     @property
-    def volume(self) -> timedelta:
+    def volume(self) -> datetime.timedelta:
         """Volume of bounding box.
 
         Volume is defined as spatial area times temporal range.
