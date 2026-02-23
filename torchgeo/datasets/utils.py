@@ -39,19 +39,7 @@ from typing_extensions import deprecated
 from .errors import DependencyNotFoundError
 
 # Waiting to upgrade Sphinx before switching to type statement
-GeoSlice: TypeAlias = """
-    slice[float | None, float | None, float | None]
-    | tuple[slice[float | None, float | None, float | None]]
-    | tuple[
-        slice[float | None, float | None, float | None],
-        slice[float | None, float | None, float | None]
-    ]
-    | tuple[
-        slice[float | None, float | None, float | None],
-        slice[float | None, float | None, float | None],
-        slice[datetime | None, datetime | None, int | None],
-    ]
-"""  # noqa: UP040
+GeoSlice: TypeAlias = 'slice[float | None, float | None, float | None] | tuple[slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None]] | tuple[slice[float | None, float | None, float | None], slice[float | None, float | None, float | None], slice[datetime | None, datetime | None, int | None]]'  # noqa: UP040
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 Sample: TypeAlias = dict[str, Any]  # noqa: UP040
 
