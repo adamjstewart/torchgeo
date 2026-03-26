@@ -48,9 +48,12 @@ class GeoSampler(Sampler[GeoSlice], ABC):
 
 
 class SpatialSampler(GeoSampler):
-    """Abstract base class for all spatial sampling strategies."""
+    """Abstract base class for all spatial sampling strategies.
 
-    def __init__(self, dataset: GeoDataset, roi: Polygon | None = None) -> None:
+    .. versionadded:: 0.10
+    """
+
+    def __init__(self, dataset: GeoDataset, *, roi: Polygon | None = None) -> None:
         """Initialize a new SpatialSampler instance.
 
         Args:
@@ -87,9 +90,12 @@ class SpatialSampler(GeoSampler):
 
 
 class TemporalSampler(GeoSampler):
-    """Abstract base class for all temporal sampling strategies."""
+    """Abstract base class for all temporal sampling strategies.
 
-    def __init__(self, dataset: GeoDataset, toi: Interval | None = None) -> None:
+    .. versionadded:: 0.10
+    """
+
+    def __init__(self, dataset: GeoDataset, *, toi: Interval | None = None) -> None:
         """Initialize a new TemporalSampler instance.
 
         Args:
@@ -112,7 +118,7 @@ class TemporalSampler(GeoSampler):
         yield from self._iter_subset()
 
     @abc.abstractmethod
-    def _iter_subset(self, index: GeoSlice | None) -> Iterator[GeoSlice]:
+    def _iter_subset(self, index: GeoSlice | None = None) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:
@@ -121,7 +127,10 @@ class TemporalSampler(GeoSampler):
 
 
 class SpatioTemporalSampler(GeoSampler):
-    """Product of a spatial and a temporal sampler."""
+    """Product of a spatial and a temporal sampler.
+
+    .. versionadded:: 0.10
+    """
 
     # akin to IntersectionDataset
     # name: ZipSampler? ProductSampler?
