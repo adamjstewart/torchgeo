@@ -15,7 +15,7 @@ from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
 from .base import SpatialSampler
 from .constants import Units
-from .utils import _to_tuple
+from .utils import _to_tuple, tile_to_chips
 
 
 class RandomSpatialSampler(SpatialSampler):
@@ -91,11 +91,12 @@ class RandomSpatialSampler(SpatialSampler):
 
         for point in points:
             # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more
-            x = slice(point.x - self.size[1] / 2, point.x + self.size[1] / 2)
-            y = slice(point.y - self.size[0] / 2, point.y + self.size[0] / 2)
-            yield x, y
-
-        # precompute and then yield from?
+            # IDEA: snap to pixel grid in RasterDataset, not here
+            xmin = point.x - self.size[1] / 2
+            xmax = point.x + self.size[1] / 2
+            ymin = point.y - self.size[0] / 2
+            ymax = point.y + self.size[0] / 2
+            yield slice(xmin, xmax), slice(ymin, ymax)
 
     def __len__(self) -> int:
         """Length of each epoch."""
@@ -149,11 +150,41 @@ class GridSpatialSampler(SpatialSampler):
         """
         super().__init__(dataset, roi=roi)
 
+        self.size = _to_tuple(size)
+        self.stride = _to_tuple(stride or size)
+
+        # Convert from pixel units to CRS units
+        if units == Units.PIXELS:
+            self.size = (self.size[0] * dataset.res[1], self.size[1] * dataset.res[0])
+            self.stride = (
+                self.stride[0] * dataset.res[1],
+                self.stride[1] * dataset.res[0],
+            )
+
     def __iter__(self) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:
             [xmin:xmax, ymin:ymax] coordinates to index a dataset.
         """
+        bounds = self.geometry.bounds
 
-        # precompute and then yield from?
+        # TODO: adjust xmin/ymin to have equal spacing in case of non-integer multiple
+        # xmid, ymid = self.geometry.centroid
+
+        rows, cols = tile_to_chips(bounds, self.size, self.stride)
+
+        # For each row...
+        for i in range(rows):
+            ymin = bounds[1] + i * self.stride[0]
+            ymax = ymin + self.size[0]
+
+            # For each column...
+            for j in range(cols):
+                xmin = bounds[0] + j * self.stride[1]
+                xmax = xmin + self.size[1]
+
+                # Check for intersection
+                bbox = shapely.box(xmin, ymin, xmax, ymax)
+                if self.geometry.intersects(bbox):
+                    yield slice(xmin, xmax), slice(ymin, ymax)
