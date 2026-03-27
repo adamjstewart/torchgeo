@@ -91,7 +91,7 @@ class RandomSpatialSampler(SpatialSampler):
 
         for point in points:
             # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more
-            # IDEA: snap to pixel grid in RasterDataset, not here
+            # IDEA: snap to pixel grid in RasterDataset, not here. Or maybe that would be incredibly confusing...
             xmin = point.x - self.size[1] / 2
             xmax = point.x + self.size[1] / 2
             ymin = point.y - self.size[0] / 2
