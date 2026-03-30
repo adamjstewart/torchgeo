@@ -39,7 +39,9 @@ class RandomTimestampSampler(TemporalSampler):
         super().__init__(dataset, toi=toi)
         self.generator = generator
 
-    def _iter_subset(self, location: GeoSlice | None = None) -> Iterator[GeoSlice]:
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -53,7 +55,7 @@ class RandomTimestampSampler(TemporalSampler):
         if location:
             # Since this only occurs in combination with a SpatialSampler, x and y are
             # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y, _ = location
+            x, y = location
             index = index.cx[x.start : x.stop, y.start : y.stop]
 
         intervals = index.index
@@ -65,5 +67,6 @@ class RandomTimestampSampler(TemporalSampler):
         intervals = intervals.sample(frac=1, random_state=self.generator)
 
         for interval in intervals:
+            x = y = slice(None)
             t = slice(interval.start, interval.stop)
-            yield None, None, t
+            yield x, y, t

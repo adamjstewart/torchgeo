@@ -117,7 +117,9 @@ class TemporalSampler(GeoSampler):
         yield from self._iter_subset()
 
     @abc.abstractmethod
-    def _iter_subset(self, location: GeoSlice | None = None) -> Iterator[GeoSlice]:
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
