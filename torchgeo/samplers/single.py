@@ -14,6 +14,7 @@ import torch
 from shapely import Polygon
 from torch import Generator
 from torch.utils.data import Sampler
+from typing_extensions import deprecated
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -79,6 +80,7 @@ class GeoSampler(Sampler[GeoSlice], abc.ABC):
         """
 
 
+@deprecated('Use torchgeo.samplers.RandomSpatialSampler instead')
 class RandomGeoSampler(GeoSampler):
     """Samples elements from a region of interest randomly.
 
@@ -196,6 +198,7 @@ class RandomGeoSampler(GeoSampler):
         return self.length
 
 
+@deprecated('Use torchgeo.samplers.GridSpatialSampler instead')
 class GridGeoSampler(GeoSampler):
     """Samples elements in a grid-like fashion.
 
@@ -301,6 +304,7 @@ class GridGeoSampler(GeoSampler):
         return self.length
 
 
+@deprecated('Use torchgeo.samplers.RandomSpatialSampler instead')
 class PreChippedGeoSampler(GeoSampler):
     """Samples entire files at a time.
 

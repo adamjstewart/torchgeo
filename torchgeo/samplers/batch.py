@@ -13,6 +13,7 @@ import torch
 from shapely import Polygon
 from torch import Generator
 from torch.utils.data import Sampler
+from typing_extensions import deprecated
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -20,6 +21,7 @@ from .constants import Units
 from .utils import _to_tuple, get_random_bounding_box, tile_to_chips
 
 
+@deprecated('Use torchgeo.samplers.GeoSampler instead')
 class BatchGeoSampler(Sampler[list[GeoSlice]], abc.ABC):
     """Abstract base class for sampling from :class:`~torchgeo.datasets.GeoDataset`.
 
@@ -78,6 +80,7 @@ class BatchGeoSampler(Sampler[list[GeoSlice]], abc.ABC):
         """
 
 
+@deprecated('Use torchgeo.samplers.RandomSpatialSampler instead')
 class RandomBatchGeoSampler(BatchGeoSampler):
     """Samples batches of elements from a region of interest randomly.
 
