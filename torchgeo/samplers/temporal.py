@@ -6,8 +6,9 @@
 from collections.abc import Iterator
 
 import pandas as pd
+from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
+from numpy.typing import ArrayLike
 from pandas import Interval
-from torch import Generator
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -25,7 +26,13 @@ class RandomTimestampSampler(TemporalSampler):
         dataset: GeoDataset,
         *,
         toi: Interval | None = None,
-        generator: Generator | None = None,
+        random_state: int
+        | ArrayLike
+        | BitGenerator
+        | Generator
+        | RandomState
+        | SeedSequence
+        | None = None,
     ) -> None:
         """Initialize a new TemporalSampler instance.
 
@@ -33,11 +40,11 @@ class RandomTimestampSampler(TemporalSampler):
             dataset: dataset to index from
             toi: time of interest to sample from
                 (defaults to the bounds of ``dataset.index``)
-            generator: Pseudo-random number generator (PRNG).
+            random_state: Pseudo-random number generator (PRNG).
         """
         # TODO: do we want a length parameter?
         super().__init__(dataset, toi=toi)
-        self.generator = generator
+        self.random_state = random_state
 
     def _iter_subset(
         self, location: tuple[slice, slice] | None = None
@@ -64,7 +71,7 @@ class RandomTimestampSampler(TemporalSampler):
         # Allows all intervals to be equally weighted, regardless of # locations
         intervals = pd.unique(intervals)
 
-        intervals = intervals.sample(frac=1, random_state=self.generator)
+        intervals = intervals.sample(frac=1, random_state=self.random_state)
 
         for interval in intervals:
             x = y = slice(None)

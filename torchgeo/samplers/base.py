@@ -181,4 +181,5 @@ class SpatioTemporalSampler(GeoSampler):
         # Or min? max? sqrt?
         # Should this depend on random or sequential?
         # Is this even possible to know ahead of time?
+        # IDEA: add RandomMixin and SequentialMixin, __len__ is only defined for RandomMixin subclasses?
         return len(self.spatial_sampler) * len(self.temporal_sampler)

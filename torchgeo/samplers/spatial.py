@@ -8,8 +8,9 @@ from collections.abc import Iterator
 
 import shapely
 from geopandas import GeoSeries
+from numpy.random import BitGenerator, Generator, SeedSequence
+from numpy.typing import ArrayLike
 from shapely import Polygon
-from torch import Generator
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -38,7 +39,7 @@ class RandomSpatialSampler(SpatialSampler):
         length: int | None = None,
         roi: Polygon | None = None,
         units: Units = Units.PIXELS,
-        generator: Generator | None = None,
+        rng: int | ArrayLike | BitGenerator | Generator | SeedSequence | None = None,
     ) -> None:
         """Initialize a new RandomSpatialSampler instance.
 
@@ -59,12 +60,12 @@ class RandomSpatialSampler(SpatialSampler):
             roi: Region of interest to sample from
                 (defaults to the bounds of ``dataset.index``).
             units: Defines if ``size`` is in pixel or CRS units.
-            generator: Pseudo-random number generator (PRNG).
+            rng: Pseudo-random number generator (PRNG).
         """
         super().__init__(dataset, roi=roi)
 
         self.size = _to_tuple(size)
-        self.generator = generator
+        self.rng = rng
 
         # Convert from pixel units to CRS units
         if units == Units.PIXELS:
@@ -88,7 +89,7 @@ class RandomSpatialSampler(SpatialSampler):
         """
         # Ensure a new set of random points for each epoch
         series = GeoSeries([self.geometry])
-        points = series.sample_points(size=self.length, rng=self.generator)
+        points = series.sample_points(size=self.length, rng=self.rng)
 
         for point in points:
             # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more
