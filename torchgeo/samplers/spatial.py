@@ -19,7 +19,7 @@ from .utils import _to_tuple, tile_to_chips
 
 
 class RandomSpatialSampler(SpatialSampler):
-    """Samples elements from a region of interest randomly.
+    """Sample locations from a region of interest randomly.
 
     This is particularly useful during training when you want to maximize the size of
     the dataset and return as many random :term:`chips <chip>` as possible. Note that
@@ -64,6 +64,7 @@ class RandomSpatialSampler(SpatialSampler):
         super().__init__(dataset, roi=roi)
 
         self.size = _to_tuple(size)
+        self.generator = generator
 
         # Convert from pixel units to CRS units
         if units == Units.PIXELS:
@@ -87,7 +88,7 @@ class RandomSpatialSampler(SpatialSampler):
         """
         # Ensure a new set of random points for each epoch
         series = GeoSeries([self.geometry])
-        points = series.sample_points(size=self.length)
+        points = series.sample_points(size=self.length, rng=self.generator)
 
         for point in points:
             # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more
@@ -104,7 +105,7 @@ class RandomSpatialSampler(SpatialSampler):
 
 
 class GridSpatialSampler(SpatialSampler):
-    """Samples elements in a grid-like fashion.
+    """Sample locations from a region of interest in a grid-like fashion.
 
     This is particularly useful during evaluation when you want to make predictions for
     an entire region of interest. You want to minimize the amount of redundant

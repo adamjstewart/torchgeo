@@ -8,7 +8,6 @@ from abc import ABC
 from collections.abc import Iterator
 from typing import Literal
 
-import pandas as pd
 from pandas import Interval
 from shapely import Polygon
 from torch.utils.data import Sampler
@@ -17,6 +16,7 @@ from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
 
 
+# TODO: alternatively call it BaseSampler to have more backwards-compatibility when deprecating the prior GeoSampler
 class GeoSampler(Sampler[GeoSlice], ABC):
     """Abstract base class for sampling from :class:`~torchgeo.datasets.GeoDataset`.
 
@@ -61,7 +61,7 @@ class SpatialSampler(GeoSampler):
             roi: Region of interest to sample from
                 (defaults to the bounds of ``dataset.index``).
         """
-        # Create one single MultiPolygon of all bounds
+        # Create one single MultiPolygon of all objects
         # Allows all locations to be equally weighted, regardless of # time stamps
         # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
         self.geometry = dataset.index.geometry.union_all()
@@ -103,8 +103,7 @@ class TemporalSampler(GeoSampler):
             toi: time of interest to sample from
                 (defaults to the bounds of ``dataset.index``)
         """
-        # Ensure all times are unique
-        self.index = pd.unique(dataset.index)
+        self.index = dataset.index
 
         if toi:
             self.index = self.index.iloc[self.index.index.overlaps(toi)]
@@ -118,8 +117,11 @@ class TemporalSampler(GeoSampler):
         yield from self._iter_subset()
 
     @abc.abstractmethod
-    def _iter_subset(self, index: GeoSlice | None = None) -> Iterator[GeoSlice]:
+    def _iter_subset(self, location: GeoSlice | None = None) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
+
+        Args:
+            location: Region of interest to sample from.
 
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
@@ -174,7 +176,7 @@ class SpatioTemporalSampler(GeoSampler):
         Returns:
             The sampler length.
         """
-        # Or min? max?
+        # Or min? max? sqrt?
         # Should this depend on random or sequential?
         # Is this even possible to know ahead of time?
         return len(self.spatial_sampler) * len(self.temporal_sampler)
