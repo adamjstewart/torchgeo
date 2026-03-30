@@ -77,3 +77,39 @@ class RandomTimestampSampler(TemporalSampler):
             x = y = slice(None)
             t = slice(interval.start, interval.stop)
             yield x, y, t
+
+
+class SequentialTimestampSampler(TemporalSampler):
+    """Sample individual timestamps from a time of interest in order.
+
+    .. versionadded:: 0.10
+    """
+
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
+        """Iterate over generated sample locations for each epoch.
+
+        Args:
+            location: Region of interest to sample from.
+
+        Yields:
+            [:, :, tmin:tmax] coordinates to index a dataset.
+        """
+        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
+        index = self.index
+        if location:
+            # Since this only occurs in combination with a SpatialSampler, x and y are
+            # guaranteed to have start and stop, and t is guaranteed to be empty
+            x, y = location
+            index = index.cx[x.start : x.stop, y.start : y.stop]
+
+        intervals = index.index
+
+        # Ensure time intervals are unique to avoid repeats
+        intervals = sorted(pd.unique(intervals))
+
+        for interval in intervals:
+            x = y = slice(None)
+            t = slice(interval.start, interval.stop)
+            yield x, y, t
