@@ -24,8 +24,8 @@ class GeoSampler(Sampler[GeoSlice], ABC):
     returns a GeoSlice that can uniquely index any :class:`~torchgeo.datasets.GeoDataset`.
     """
 
-    @abc.abstractmethod
     @property
+    @abc.abstractmethod
     def strategy(self) -> Literal['random', 'sequential']:
         """Sampling strategy.
 

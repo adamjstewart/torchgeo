@@ -22,6 +22,7 @@ from .constants import Units
 from .utils import _to_tuple, get_random_bounding_box, tile_to_chips
 
 
+@deprecated('Use torchgeo.samplers.GeoSampler instead')
 class GeoSampler(Sampler[GeoSlice], abc.ABC):
     """Abstract base class for sampling from :class:`~torchgeo.datasets.GeoDataset`.
 

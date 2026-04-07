@@ -18,13 +18,13 @@ from torch.utils.data import DataLoader
 from torchgeo.datasets import GeoDataset, stack_samples
 from torchgeo.datasets.utils import GeoSlice, Sample
 from torchgeo.samplers import (
-    GeoSampler,
     GridGeoSampler,
     PreChippedGeoSampler,
     RandomGeoSampler,
     Units,
     tile_to_chips,
 )
+from torchgeo.samplers.single import GeoSampler
 
 MINT = pd.Timestamp(2025, 4, 24)
 MAXT = pd.Timestamp(2025, 4, 25)
