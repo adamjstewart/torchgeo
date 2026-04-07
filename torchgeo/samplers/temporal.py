@@ -243,6 +243,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
 
         x = y = slice(None)
         for _ in range(length):
+            # TODO: ensure this doesn't escape our TOI
             interval = Interval(left, left + self.delta)
             if index.index.overlaps(interval):
                 t = slice(interval.start, interval.stop)
@@ -329,3 +330,57 @@ class RandomPeriodSampler(TemporalSampler):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
                 i += 1
+
+
+class SequentialPeriodSampler(TemporalSampler):
+    """Sample fixed window periods from a time of interest sequentially.
+
+    .. versionadded:: 0.10
+    """
+
+    def __init__(
+        self, dataset: GeoDataset, *, freq: str, toi: Interval | None = None
+    ) -> None:
+        """Initialize a new SequentialTimedeltaSampler instance.
+
+        Args:
+            dataset: Dataset to sample from.
+            freq: Temporal frequencies to sample. Accepts any valid `period alias
+                <https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-period-aliases>`_.
+            toi: Time of interest to sample from
+                (defaults to the bounds of ``dataset.index``).
+        """
+        # TODO: do we want stride here? How would it even work?
+        super().__init__(dataset, toi=toi)
+        self.freq = freq
+
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
+        """Iterate over generated sample locations for each epoch.
+
+        Args:
+            location: Region of interest to sample from.
+
+        Yields:
+            [:, :, tmin:tmax] coordinates to index a dataset.
+        """
+        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
+        index = self.index
+        if location:
+            # Since this only occurs in combination with a SpatialSampler, x and y are
+            # guaranteed to have start and stop, and t is guaranteed to be empty
+            x, y = location
+            index = index.cx[x.start : x.stop, y.start : y.stop]
+
+        left = index.index.left.min()
+        right = index.index.right.max()
+
+        x = y = slice(None)
+        while left < right:
+            period = Period(left, freq=self.freq)
+            interval = Interval(period.start_time, period.end_time)
+            if index.index.overlaps(interval):
+                t = slice(interval.start, interval.stop)
+                yield x, y, t
+            left = period.mid + (period.end_time - period.start_time)
