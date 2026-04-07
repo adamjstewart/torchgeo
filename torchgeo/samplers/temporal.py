@@ -9,7 +9,6 @@ from collections.abc import Iterator
 import numpy as np
 import pandas as pd
 from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
-from numpy.typing import ArrayLike
 from pandas import Interval, Timedelta
 
 from ..datasets import GeoDataset
@@ -29,7 +28,6 @@ class RandomTimestampSampler(TemporalSampler):
         *,
         toi: Interval | None = None,
         generator: int
-        | ArrayLike
         | BitGenerator
         | Generator
         | RandomState
@@ -131,7 +129,6 @@ class RandomTimedeltaSampler(TemporalSampler):
         length: int | None = None,
         toi: Interval | None = None,
         generator: int
-        | ArrayLike
         | BitGenerator
         | Generator
         | RandomState

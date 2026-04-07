@@ -10,7 +10,6 @@ import numpy as np
 import shapely
 from geopandas import GeoSeries
 from numpy.random import BitGenerator, Generator, SeedSequence
-from numpy.typing import ArrayLike
 from shapely import Polygon
 
 from ..datasets import GeoDataset
@@ -40,12 +39,7 @@ class RandomSpatialSampler(SpatialSampler):
         length: int | None = None,
         roi: Polygon | None = None,
         units: Units = Units.PIXELS,
-        generator: int
-        | ArrayLike
-        | BitGenerator
-        | Generator
-        | SeedSequence
-        | None = None,
+        generator: int | BitGenerator | Generator | SeedSequence | None = None,
     ) -> None:
         """Initialize a new RandomSpatialSampler instance.
 
