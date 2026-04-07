@@ -3,6 +3,7 @@
 
 """Temporal sampling routines."""
 
+import math
 from collections.abc import Iterator
 
 import numpy as np
@@ -189,3 +190,64 @@ class RandomTimedeltaSampler(TemporalSampler):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
                 i += 1
+
+
+class SequentialTimedeltaSampler(TemporalSampler):
+    """Sample sliding window timedeltas from a time of interest sequentially.
+
+    .. versionadded:: 0.10
+    """
+
+    def __init__(
+        self,
+        dataset: GeoDataset,
+        *,
+        delta: Timedelta,
+        stride: Timedelta | None = None,
+        toi: Interval | None = None,
+    ) -> None:
+        """Initialize a new SequentialTimedeltaSampler instance.
+
+        Args:
+            dataset: Dataset to sample from.
+            delta: Duration of time.
+            stride: Duration to skip between each sample (defaults to *delta*).
+            toi: Time of interest to sample from
+                (defaults to the bounds of ``dataset.index``).
+        """
+        super().__init__(dataset, toi=toi)
+        self.delta = delta
+        self.stride = stride or delta
+
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
+        """Iterate over generated sample locations for each epoch.
+
+        Args:
+            location: Region of interest to sample from.
+
+        Yields:
+            [:, :, tmin:tmax] coordinates to index a dataset.
+        """
+        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
+        index = self.index
+        if location:
+            # Since this only occurs in combination with a SpatialSampler, x and y are
+            # guaranteed to have start and stop, and t is guaranteed to be empty
+            x, y = location
+            index = index.cx[x.start : x.stop, y.start : y.stop]
+
+        left = index.index.left.min()
+        right = index.index.right.max() - self.delta
+
+        # TODO: make tile_to_chips more generic, support 1D inputs
+        length = math.ceil((right - left - self.delta) / self.stride) + 1
+
+        x = y = slice(None)
+        for _ in range(length):
+            interval = Interval(left, left + self.delta)
+            if index.index.overlaps(interval):
+                t = slice(interval.start, interval.stop)
+                yield x, y, t
+            left += self.delta
