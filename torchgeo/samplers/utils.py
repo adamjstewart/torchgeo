@@ -34,7 +34,7 @@ def _to_tuple(value: tuple[float, float] | float) -> tuple[float, float]:
         return value
 
 
-@deprecated('Use torchgeo.samplers.RandomSpatialSampler instead')
+@deprecated('Use geopandas.GeoSeries.sample_points instead')
 def get_random_bounding_box(
     bounds: tuple[float, float, float, float],
     size: tuple[float, float] | float,

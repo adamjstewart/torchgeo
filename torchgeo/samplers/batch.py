@@ -21,7 +21,10 @@ from .constants import Units
 from .utils import _to_tuple, get_random_bounding_box, tile_to_chips
 
 
-@deprecated('Use torchgeo.samplers.GeoSampler instead')
+# This class is deprecated, but we don't issue a deprecation warning because:
+#
+# 1. importing torchgeo.samplers would result in a warning due to subclass creation
+# 2. each subclass has its own more specific deprecation warning anyway
 class BatchGeoSampler(Sampler[list[GeoSlice]], abc.ABC):
     """Abstract base class for sampling from :class:`~torchgeo.datasets.GeoDataset`.
 

@@ -29,6 +29,8 @@ from torchgeo.samplers.single import GeoSampler
 MINT = pd.Timestamp(2025, 4, 24)
 MAXT = pd.Timestamp(2025, 4, 25)
 
+pytestmark = pytest.mark.filterwarnings('ignore:Use .* instead:DeprecationWarning')
+
 
 class CustomGeoSampler(GeoSampler):
     def __iter__(self) -> Iterator[GeoSlice]:
