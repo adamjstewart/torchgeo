@@ -9,7 +9,7 @@ from collections.abc import Iterator
 import numpy as np
 import pandas as pd
 from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
-from pandas import Interval, Timedelta
+from pandas import Interval, Period, Timedelta
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -248,3 +248,84 @@ class SequentialTimedeltaSampler(TemporalSampler):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
             left += self.delta
+
+
+class RandomPeriodSampler(TemporalSampler):
+    """Sample fixed window periods from a time of interest randomly.
+
+    .. versionadded:: 0.10
+    """
+
+    def __init__(
+        self,
+        dataset: GeoDataset,
+        *,
+        freq: str,
+        length: int | None = None,
+        toi: Interval | None = None,
+        generator: int
+        | BitGenerator
+        | Generator
+        | RandomState
+        | SeedSequence
+        | None = None,
+    ) -> None:
+        """Initialize a new RandomPeriodSampler instance.
+
+        Args:
+            dataset: Dataset to sample from.
+            freq: Temporal frequencies to sample. Accepts any valid `period alias
+                <https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-period-aliases>`_.
+            length: Number of random samples to draw per epoch
+                (defaults to approximately the maximal number of non-overlapping
+                periods that could be sampled from the dataset).
+            toi: Time of interest to sample from
+                (defaults to the bounds of ``dataset.index``).
+            generator: Pseudo-random number generator (PRNG).
+        """
+        super().__init__(dataset, toi=toi)
+        self.delta = freq
+        # TODO: should these be moved to _iter_subset? Length will change each epoch
+        left = self.index.index.left.min()
+        right = self.index.index.right.max()
+        self.length = length or (right - left) // Period(left, freq=freq)
+        self.generator = np.random.default_rng(generator)
+
+    def _iter_subset(
+        self, location: tuple[slice, slice] | None = None
+    ) -> Iterator[GeoSlice]:
+        """Iterate over generated sample locations for each epoch.
+
+        Args:
+            location: Region of interest to sample from.
+
+        Yields:
+            [:, :, tmin:tmax] coordinates to index a dataset.
+        """
+        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
+        index = self.index
+        if location:
+            # Since this only occurs in combination with a SpatialSampler, x and y are
+            # guaranteed to have start and stop, and t is guaranteed to be empty
+            x, y = location
+            index = index.cx[x.start : x.stop, y.start : y.stop]
+
+        left = index.index.left.min()
+        right = index.index.right.max()
+
+        # Expand to full period to support balanced sampling
+        # E.g., if data is from summer 2024 to summer 2026, we don't want to sample
+        # from 2025 twice as often as 2024 and 2026
+        left = Period(left, freq=self.freq).start_time
+        right = Period(right, freq=self.freq).end_time
+
+        i = 0
+        x = y = slice(None)
+        while i < self.length:
+            timestamp = self.generator.uniform(left, right)
+            period = Period(timestamp, freq=self.freq)
+            interval = Interval(period.start_time, period.end_time)
+            if index.index.overlaps(interval):
+                t = slice(interval.start, interval.stop)
+                yield x, y, t
+                i += 1
