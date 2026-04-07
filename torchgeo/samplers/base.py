@@ -57,7 +57,7 @@ class SpatialSampler(GeoSampler):
         """Initialize a new SpatialSampler instance.
 
         Args:
-            dataset: Dataset to index from.
+            dataset: Dataset to sample from.
             roi: Region of interest to sample from
                 (defaults to the bounds of ``dataset.index``).
         """
@@ -99,9 +99,9 @@ class TemporalSampler(GeoSampler):
         """Initialize a new TemporalSampler instance.
 
         Args:
-            dataset: dataset to index from
-            toi: time of interest to sample from
-                (defaults to the bounds of ``dataset.index``)
+            dataset: Dataset to sample from.
+            toi: Time of interest to sample from
+                (defaults to the bounds of ``dataset.index``).
         """
         self.index = dataset.index
 
