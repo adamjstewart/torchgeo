@@ -46,6 +46,19 @@ class GeoSampler(Sampler[GeoSlice], ABC):
             [xmin:xmax, ymin:ymax, tmin:tmax] coordinates to index a dataset.
         """
 
+    def __len__(self) -> int:
+        """Length of each epoch.
+
+        Returns:
+            The sampler length.
+        """
+        if hasattr(self, 'length'):
+            # If length is known, use it
+            return self.length
+        else:
+            # Otherwise, brute force
+            return len(iter(self))
+
 
 class SpatialSampler(GeoSampler):
     """Abstract base class for all spatial sampling strategies.

@@ -105,10 +105,6 @@ class RandomSpatialSampler(SpatialSampler):
             ymax = point.y + self.size[0] / 2
             yield slice(xmin, xmax), slice(ymin, ymax)
 
-    def __len__(self) -> int:
-        """Length of each epoch."""
-        return self.length
-
 
 class GridSpatialSampler(SpatialSampler):
     """Sample locations from a region of interest in a grid-like fashion.
