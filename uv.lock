@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and platform_machine == 'ARM64' and sys_platform == 'win32'",
@@ -3821,7 +3821,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26" },
     { name = "olmoearth-pretrain-minimal", marker = "extra == 'models'", specifier = ">=0.0.2" },
     { name = "packaging", marker = "extra == 'tests'", specifier = ">=21" },
-    { name = "pandas", specifier = ">=2.3.3" },
+    { name = "pandas", specifier = ">=2.1.1" },
     { name = "pandas", extras = ["parquet"], marker = "extra == 'datasets'", specifier = ">=2.1.1" },
     { name = "pandas-stubs", marker = "extra == 'style'", specifier = ">=2.1.1" },
     { name = "pillow", specifier = ">=10" },
