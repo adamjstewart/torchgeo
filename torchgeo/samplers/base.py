@@ -56,8 +56,8 @@ class GeoSampler(Sampler[GeoSlice], ABC):
             # If length is known, use it
             return self.length
         else:
-            # Otherwise, brute force
-            return len(iter(self))
+            # Otherwise, use brute force
+            return sum(1 for _ in self)
 
 
 class SpatialSampler(GeoSampler):
