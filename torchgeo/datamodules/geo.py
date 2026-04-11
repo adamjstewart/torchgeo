@@ -17,8 +17,8 @@ from ..datasets.utils import Sample
 from ..samplers import (
     BatchGeoSampler,
     GeoSampler,
-    GridGeoSampler,
-    RandomBatchGeoSampler,
+    GridSpatialSampler,
+    RandomSpatialSampler,
 )
 from .utils import MisconfigurationException
 
@@ -228,8 +228,8 @@ class GeoDataModule(BaseDataModule):
                     **self.kwargs,
                 ),
             )
-            self.train_batch_sampler = RandomBatchGeoSampler(
-                self.train_dataset, self.patch_size, self.batch_size, self.length
+            self.train_sampler = RandomSpatialSampler(
+                self.train_dataset, size=self.patch_size, length=self.length
             )
         if stage in ['fit', 'validate']:
             self.val_dataset = cast(
@@ -239,8 +239,8 @@ class GeoDataModule(BaseDataModule):
                     **self.kwargs,
                 ),
             )
-            self.val_sampler = GridGeoSampler(
-                self.val_dataset, self.patch_size, self.patch_size
+            self.val_sampler = GridSpatialSampler(
+                self.val_dataset, size=self.patch_size, stride=self.patch_size
             )
         if stage in ['test']:
             self.test_dataset = cast(
@@ -250,8 +250,8 @@ class GeoDataModule(BaseDataModule):
                     **self.kwargs,
                 ),
             )
-            self.test_sampler = GridGeoSampler(
-                self.test_dataset, self.patch_size, self.patch_size
+            self.test_sampler = GridSpatialSampler(
+                self.test_dataset, size=self.patch_size, stride=self.patch_size
             )
 
     def _dataloader_factory(self, split: str) -> DataLoader[Sample]:
