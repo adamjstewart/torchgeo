@@ -32,6 +32,6 @@ class CustomGeoDataset(GeoDataset):
         return {'bounds': self._slice_to_tensor(index)}
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='package')
 def dataset() -> GeoDataset:
     return CustomGeoDataset()
