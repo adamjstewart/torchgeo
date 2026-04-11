@@ -58,7 +58,7 @@ dependencies = [
     # numpy 1.26+ required for Python 3.12 wheels
     "numpy>=1.26",
     # pandas 2.1.1+ required for Python 3.12 wheels
-    "pandas>=2.1.1",
+    "pandas>=2.3.3",
     # pillow 10+ required for Python 3.12 wheels
     "pillow>=10",
     # pyproj 3.6.1+ required for Python 3.12 wheels
