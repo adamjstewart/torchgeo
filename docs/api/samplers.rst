@@ -43,14 +43,12 @@ This data loader will iterate over all valid locations and all valid times, with
 The majority of spatial and temporal samplers have both random and sequential variants. Random variants are recommended at training time to maximize the diversity of the dataset, while sequential variants are recommended at inference time to ensure complete coverage of the dataset.
 
 .. autosummary::
-   :toctree:
    :caption: Spatial Samplers
 
    RandomSpatialSampler
    GridSpatialSampler
 
 .. autosummary::
-   :toctree:
    :caption: Temporal Samplers
 
    RandomTimestampSampler
@@ -67,7 +65,6 @@ Base Classes
 If you want to write your own custom sampler, you can extend one of these abstract base classes.
 
 .. autosummary::
-   :toctree:
    :caption: Base Classes
 
    GeoSampler
