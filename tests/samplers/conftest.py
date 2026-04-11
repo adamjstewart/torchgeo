@@ -27,6 +27,7 @@ class CustomGeoDataset(GeoDataset):
         ]
         crs = CRS.from_epsg(3005)
         self.index = GeoDataFrame(index=index, geometry=geometry, crs=crs)
+        self.res = 2
 
     def __getitem__(self, index: GeoSlice) -> Sample:
         return {'bounds': self._slice_to_tensor(index)}

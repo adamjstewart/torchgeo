@@ -76,15 +76,15 @@ class RandomSpatialSampler(SpatialSampler):
         if units == Units.PIXELS:
             self.size = (self.size[0] * dataset.res[1], self.size[1] * dataset.res[0])
 
+        # Default to approximate number of non-overlapping patches
+        patch_area = self.size[0] * self.size[1]
+        self.length = length or int(shapely.area(self.geometry) // patch_area)
+
         # Erosion to avoid out-of-bounds sampling
         # Purposefully conservative radius calculation
         # TODO: this operation removes Point and LineString, should we keep these?
         distance = math.sqrt((self.size[0] / 2) ** 2 + (self.size[1] / 2) ** 2)
         self.geometry = shapely.buffer(self.geometry, -distance)
-
-        # Default to approximate number of non-overlapping patches
-        patch_area = self.size[0] * self.size[1]
-        self.length = length or shapely.area(self.geometry) // patch_area
 
     def __iter__(self) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
