@@ -3,12 +3,11 @@
 
 from collections.abc import Iterator
 
-import pandas as pd
 import pytest
 import shapely
 from _pytest.fixtures import SubRequest
 from geopandas import GeoSeries
-from pandas import Interval
+from pandas import Interval, Timestamp
 from torch.utils.data import DataLoader
 
 from torchgeo.datasets import GeoDataset
@@ -20,8 +19,8 @@ from torchgeo.samplers import (
     TemporalSampler,
 )
 
-TMIN = pd.Timestamp(2025, 4, 1)
-TMAX = pd.Timestamp(2025, 4, 30)
+TMIN = Timestamp(2025, 4, 1)
+TMAX = Timestamp(2025, 4, 30)
 
 
 class CustomGeoSampler(GeoSampler):
@@ -136,8 +135,8 @@ class TestTemporalSampler:
         assert TMIN <= t.start < t.stop <= TMAX
 
     def test_toi(self, dataset: GeoDataset) -> None:
-        tmin = pd.Timestamp(2025, 4, 10)
-        tmax = pd.Timestamp(2025, 4, 20)
+        tmin = Timestamp(2025, 4, 10)
+        tmax = Timestamp(2025, 4, 20)
         toi = Interval(tmin, tmax)
         sampler = CustomTemporalSampler(dataset, toi=toi)
         _, _, t = next(iter(sampler))

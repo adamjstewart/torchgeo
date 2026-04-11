@@ -22,6 +22,8 @@ class RandomTimestampSampler(TemporalSampler):
     .. versionadded:: 0.10
     """
 
+    strategy = 'random'
+
     def __init__(
         self,
         dataset: GeoDataset,
@@ -67,7 +69,7 @@ class RandomTimestampSampler(TemporalSampler):
 
         x, y = location
         for interval in intervals:
-            t = slice(interval.start, interval.stop)
+            t = slice(interval.left, interval.right)
             yield x, y, t
 
 
@@ -76,6 +78,8 @@ class SequentialTimestampSampler(TemporalSampler):
 
     .. versionadded:: 0.10
     """
+
+    strategy = 'sequential'
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
@@ -95,7 +99,7 @@ class SequentialTimestampSampler(TemporalSampler):
 
         x, y = location
         for interval in intervals:
-            t = slice(interval.start, interval.stop)
+            t = slice(interval.left, interval.right)
             yield x, y, t
 
 
@@ -104,6 +108,8 @@ class RandomTimedeltaSampler(TemporalSampler):
 
     .. versionadded:: 0.10
     """
+
+    strategy = 'random'
 
     def __init__(
         self,
@@ -162,7 +168,7 @@ class RandomTimedeltaSampler(TemporalSampler):
             tmax = tmin + self.delta
             interval = Interval(tmin, tmax)
             if intervals.overlaps(interval):
-                t = slice(interval.start, interval.stop)
+                t = slice(interval.left, interval.right)
                 yield x, y, t
                 i += 1
 
@@ -172,6 +178,8 @@ class SequentialTimedeltaSampler(TemporalSampler):
 
     .. versionadded:: 0.10
     """
+
+    strategy = 'sequential'
 
     def __init__(
         self,
@@ -218,7 +226,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
             # TODO: ensure this doesn't escape our TOI
             interval = Interval(left, left + self.delta)
             if intervals.overlaps(interval):
-                t = slice(interval.start, interval.stop)
+                t = slice(interval.left, interval.right)
                 yield x, y, t
             left += self.delta
 
@@ -228,6 +236,8 @@ class RandomPeriodSampler(TemporalSampler):
 
     .. versionadded:: 0.10
     """
+
+    strategy = 'random'
 
     def __init__(
         self,
@@ -293,7 +303,7 @@ class RandomPeriodSampler(TemporalSampler):
             period = Period(timestamp, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
             if intervals.overlaps(interval):
-                t = slice(interval.start, interval.stop)
+                t = slice(interval.left, interval.right)
                 yield x, y, t
                 i += 1
 
@@ -303,6 +313,8 @@ class SequentialPeriodSampler(TemporalSampler):
 
     .. versionadded:: 0.10
     """
+
+    strategy = 'sequential'
 
     def __init__(
         self, dataset: GeoDataset, *, freq: str, toi: Interval | None = None
@@ -341,6 +353,6 @@ class SequentialPeriodSampler(TemporalSampler):
             period = Period(left, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
             if intervals.overlaps(interval):
-                t = slice(interval.start, interval.stop)
+                t = slice(interval.left, interval.right)
                 yield x, y, t
             left = period.mid + (period.end_time - period.start_time)

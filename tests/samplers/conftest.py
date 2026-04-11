@@ -2,10 +2,10 @@
 # Licensed under the MIT License.
 
 
-import pandas as pd
 import pytest
 import shapely
 from geopandas import GeoDataFrame
+from pandas import IntervalIndex, Timestamp
 from pyproj import CRS
 
 from torchgeo.datasets import GeoDataset
@@ -15,11 +15,11 @@ from torchgeo.datasets.utils import GeoSlice, Sample
 class CustomGeoDataset(GeoDataset):
     def __init__(self) -> None:
         intervals = [
-            (pd.Timestamp(2025, 4, 1), pd.Timestamp(2025, 4, 2)),
-            (pd.Timestamp(2025, 4, 15), pd.Timestamp(2025, 4, 16)),
-            (pd.Timestamp(2025, 4, 29), pd.Timestamp(2025, 4, 30)),
+            (Timestamp(2025, 4, 1), Timestamp(2025, 4, 2)),
+            (Timestamp(2025, 4, 15), Timestamp(2025, 4, 16)),
+            (Timestamp(2025, 4, 29), Timestamp(2025, 4, 30)),
         ]
-        index = pd.IntervalIndex.from_tuples(intervals, closed='both', name='datetime')
+        index = IntervalIndex.from_tuples(intervals, closed='both', name='datetime')
         geometry = [
             shapely.box(0, 0, 100, 100),
             shapely.box(0, 0, 10, 10),
