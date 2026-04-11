@@ -1,7 +1,7 @@
 torchgeo.samplers
 =================
 
-.. module:: torchgeo.samplers
+.. automodule:: torchgeo.samplers
 
 Samplers
 --------
@@ -42,14 +42,18 @@ This data loader will iterate over all valid locations and all valid times, with
 
 The majority of spatial and temporal samplers have both random and sequential variants. Random variants are recommended at training time to maximize the diversity of the dataset, while sequential variants are recommended at inference time to ensure complete coverage of the dataset.
 
+Spatial Samplers
+^^^^^^^^^^^^^^^^
+
 .. autosummary::
-   :caption: Spatial Samplers
 
    RandomSpatialSampler
    GridSpatialSampler
 
+Temporal Samplers
+^^^^^^^^^^^^^^^^^
+
 .. autosummary::
-   :caption: Temporal Samplers
 
    RandomTimestampSampler
    SequentialTimestampSampler
@@ -58,20 +62,17 @@ The majority of spatial and temporal samplers have both random and sequential va
    RandomPeriodSampler
    SequentialPeriodSampler
 
-
 Base Classes
 ------------
 
 If you want to write your own custom sampler, you can extend one of these abstract base classes.
 
 .. autosummary::
-   :caption: Base Classes
 
    GeoSampler
    SpatialSampler
    TemporalSampler
    SpatioTemporalSampler
-
 
 Utilities
 ---------
