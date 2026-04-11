@@ -57,7 +57,7 @@ class RandomTimestampSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         # Ensure time intervals are unique
         # Allows all intervals to be equally weighted, regardless of # locations
@@ -88,7 +88,7 @@ class SequentialTimestampSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         # Ensure time intervals are unique to avoid repeats
         intervals = sorted(pd.unique(intervals))
@@ -150,7 +150,7 @@ class RandomTimedeltaSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         left = intervals.left.min()
         right = intervals.right.max() - self.delta
@@ -205,7 +205,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         left = intervals.left.min()
         right = intervals.right.max() - self.delta
@@ -275,7 +275,7 @@ class RandomPeriodSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         left = intervals.left.min()
         right = intervals.right.max()
@@ -331,7 +331,7 @@ class SequentialPeriodSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
 
         left = intervals.left.min()
         right = intervals.right.max()

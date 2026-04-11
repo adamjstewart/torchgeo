@@ -9,7 +9,6 @@ from collections.abc import Iterator
 from typing import Literal
 
 import numpy as np
-from geopandas import GeoDataFrame
 from pandas import Interval, IntervalIndex
 from shapely import Polygon
 from torch.utils.data import Sampler
@@ -140,19 +139,18 @@ class TemporalSampler(GeoSampler):
         yield from self._iter_subset()
 
     def _init_subset(
-        self,
-        index: GeoDataFrame,
-        location: tuple[slice, slice] = (slice(None), slice(None)),
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> IntervalIndex:
         """Narrow down index to a specific location.
 
         Args:
-            index: A GeoDataset index.
             location: A specific location.
 
         Returns:
-            A subset of *index* at *location*.
+            A subset of *self.index* at *location*.
         """
+        index = self.index
+
         # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
         if location:
             # Since this only occurs in combination with a SpatialSampler, x and y are

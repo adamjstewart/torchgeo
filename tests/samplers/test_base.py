@@ -54,7 +54,7 @@ class CustomTemporalSampler(TemporalSampler):
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
-        intervals = self._init_subset(self.index, location)
+        intervals = self._init_subset(location)
         intervals = intervals.to_series().sample(frac=1)
         x, y = location
         for interval in intervals:
