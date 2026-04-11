@@ -11,7 +11,6 @@ from pandas import Interval, Timestamp
 from torch.utils.data import DataLoader
 
 from torchgeo.datasets import GeoDataset
-from torchgeo.datasets.utils import GeoSlice
 from torchgeo.samplers import (
     GeoSampler,
     SpatialSampler,
@@ -31,7 +30,7 @@ class CustomGeoSampler(GeoSampler):
         if length:
             self.length = length
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice, slice]]:
         for i in range(self.hidden_length):
             yield slice(i, i), slice(i, i), slice(TMIN, TMAX)
 
@@ -40,7 +39,7 @@ class CustomSpatialSampler(SpatialSampler):
     strategy = 'random'
     length = 5
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice]]:
         series = GeoSeries([self.geometry])
         points = series.sample_points(size=self.length).explode()
         for point in points:
@@ -52,7 +51,7 @@ class CustomTemporalSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         intervals = self._init_subset(location)
         intervals = intervals.to_series().sample(frac=1)
         x, y = location
@@ -111,9 +110,9 @@ class TestSpatialSampler:
         sampler = spatial_sampler @ temporal_sampler
         assert isinstance(sampler, SpatioTemporalSampler)
 
-    def test_abstract(self) -> None:
+    def test_abstract(self, dataset: GeoDataset) -> None:
         with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-            SpatialSampler()
+            SpatialSampler(dataset)
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
@@ -150,9 +149,9 @@ class TestTemporalSampler:
     def test_len(self, sampler: CustomTemporalSampler) -> None:
         assert len(sampler) == 3
 
-    def test_abstract(self) -> None:
+    def test_abstract(self, dataset: GeoDataset) -> None:
         with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-            TemporalSampler()
+            TemporalSampler(dataset)
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])

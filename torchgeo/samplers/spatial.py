@@ -13,7 +13,6 @@ from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 from shapely import Polygon
 
 from ..datasets import GeoDataset
-from ..datasets.utils import GeoSlice
 from .base import SpatialSampler
 from .constants import Units
 from .utils import _to_tuple, tile_to_chips
@@ -86,7 +85,7 @@ class RandomSpatialSampler(SpatialSampler):
         distance = math.sqrt((self.size[0] / 2) ** 2 + (self.size[1] / 2) ** 2)
         self.geometry = shapely.buffer(self.geometry, -distance)
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:
@@ -164,7 +163,7 @@ class GridSpatialSampler(SpatialSampler):
                 self.stride[1] * dataset.res[0],
             )
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:

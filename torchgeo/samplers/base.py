@@ -25,6 +25,8 @@ class GeoSampler(Sampler[GeoSlice], ABC):
     returns a GeoSlice that can uniquely index any :class:`~torchgeo.datasets.GeoDataset`.
     """
 
+    length: int
+
     @property
     @abc.abstractmethod
     def strategy(self) -> Literal['random', 'sequential']:
@@ -84,7 +86,7 @@ class SpatialSampler(GeoSampler):
             self.geometry &= roi
 
     @abc.abstractmethod
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:
@@ -130,7 +132,7 @@ class TemporalSampler(GeoSampler):
                 tmin, tmax, closed='both', name='datetime'
             )
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:
@@ -158,12 +160,12 @@ class TemporalSampler(GeoSampler):
             x, y = location
             index = index.cx[x.start : x.stop, y.start : y.stop]
 
-        return index.index
+        return index.index  # ty: ignore[invalid-return-type]
 
     @abc.abstractmethod
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -198,7 +200,7 @@ class SpatioTemporalSampler(GeoSampler):
         self.spatial_sampler = spatial_sampler
         self.temporal_sampler = temporal_sampler
 
-    def __iter__(self) -> Iterator[GeoSlice]:
+    def __iter__(self) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Yields:

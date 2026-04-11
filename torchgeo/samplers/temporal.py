@@ -12,7 +12,6 @@ from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
 from pandas import Interval, Period, Timedelta, Timestamp
 
 from ..datasets import GeoDataset
-from ..datasets.utils import GeoSlice
 from .base import TemporalSampler
 
 
@@ -50,7 +49,7 @@ class RandomTimestampSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -83,7 +82,7 @@ class SequentialTimestampSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -147,7 +146,7 @@ class RandomTimedeltaSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -205,7 +204,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -278,7 +277,7 @@ class RandomPeriodSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
@@ -336,7 +335,7 @@ class SequentialPeriodSampler(TemporalSampler):
 
     def _iter_subset(
         self, location: tuple[slice, slice] = (slice(None), slice(None))
-    ) -> Iterator[GeoSlice]:
+    ) -> Iterator[tuple[slice, slice, slice]]:
         """Iterate over generated sample locations for each epoch.
 
         Args:
