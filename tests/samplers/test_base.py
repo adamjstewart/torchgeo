@@ -64,12 +64,13 @@ class CustomTemporalSampler(TemporalSampler):
     strategy = 'random'
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         intervals = self._init_subset(self.index, location)
         intervals = intervals.to_series().sample(frac=1)
+        x, y = location
         for interval in intervals:
-            yield slice(None), slice(None), slice(interval.left, interval.right)
+            yield x, y, slice(interval.left, interval.right)
 
 
 @pytest.fixture(scope='module')
@@ -179,6 +180,53 @@ class TestTemporalSampler:
         self,
         dataset: CustomGeoDataset,
         sampler: CustomTemporalSampler,
+        num_workers: int,
+    ) -> None:
+        dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
+        for _ in dl:
+            continue
+
+
+class TestSpatioTemporalSampler:
+    @pytest.fixture(scope='class', params=['random', 'sequential'])
+    def spatial_sampler(
+        self, dataset: CustomGeoDataset, request: SubRequest
+    ) -> CustomSpatialSampler:
+        sampler = CustomSpatialSampler(dataset)
+        sampler.strategy = request.param
+        return sampler
+
+    @pytest.fixture(scope='class', params=['random', 'sequential'])
+    def temporal_sampler(
+        self, dataset: CustomGeoDataset, request: SubRequest
+    ) -> CustomTemporalSampler:
+        sampler = CustomTemporalSampler(dataset)
+        sampler.strategy = request.param
+        return sampler
+
+    @pytest.fixture(scope='class')
+    def sampler(
+        self,
+        spatial_sampler: CustomSpatialSampler,
+        temporal_sampler: CustomTemporalSampler,
+    ) -> SpatioTemporalSampler:
+        return spatial_sampler @ temporal_sampler
+
+    def test_iter(self, sampler: SpatioTemporalSampler) -> None:
+        x, y, t = next(iter(sampler))
+        assert 0 <= x.start == x.stop <= 100
+        assert 0 <= y.start == y.stop <= 100
+        assert t.start == TMIN and t.stop == TMAX
+
+    def test_len(self, sampler: CustomTemporalSampler) -> None:
+        assert len(sampler) == 5
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize('num_workers', [0, 1, 2])
+    def test_dataloader(
+        self,
+        dataset: CustomGeoDataset,
+        sampler: SpatioTemporalSampler,
         num_workers: int,
     ) -> None:
         dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)

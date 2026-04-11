@@ -206,24 +206,19 @@ class SpatioTemporalSampler(GeoSampler):
         """
         match self.spatial_sampler.strategy, self.temporal_sampler.strategy:
             case 'random', 'random':
-                for _ in range(len(self)):
+                for _ in range(len(self.spatial_sampler) * len(self.temporal_sampler)):
                     location = next(iter(self.spatial_sampler))
-                    index = next(iter(self.temporal_sampler._iter_subset(location)))
-                    yield index
+                    yield next(iter(self.temporal_sampler._iter_subset(location)))
             case 'sequential', 'sequential':
-                for location in self.spatial_sampler:
-                    for index in self.temporal_sampler._iter_subset(location):
+                for location in iter(self.spatial_sampler):
+                    for index in iter(self.temporal_sampler._iter_subset(location)):
                         yield index
-            # TODO: random-sequential, sequential-random
-
-    def __len__(self) -> int:
-        """Length of each epoch.
-
-        Returns:
-            The sampler length.
-        """
-        # Or min? max? sqrt?
-        # Should this depend on random or sequential?
-        # Is this even possible to know ahead of time?
-        # IDEA: add RandomMixin and SequentialMixin, __len__ is only defined for RandomMixin subclasses?
-        return len(self.spatial_sampler) * len(self.temporal_sampler)
+            case 'random', 'sequential':
+                for _ in range(len(self.spatial_sampler)):
+                    location = next(iter(self.spatial_sampler))
+                    for index in iter(self.temporal_sampler._iter_subset(location)):
+                        yield index
+            case 'sequential', 'random':
+                for location in iter(self.spatial_sampler):
+                    for _ in range(len(self.temporal_sampler)):
+                        yield next(iter(self.temporal_sampler._iter_subset(location)))

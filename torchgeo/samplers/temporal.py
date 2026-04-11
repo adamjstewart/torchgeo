@@ -47,7 +47,7 @@ class RandomTimestampSampler(TemporalSampler):
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -65,7 +65,7 @@ class RandomTimestampSampler(TemporalSampler):
 
         intervals = intervals.to_series().sample(frac=1, random_state=self.generator)
 
-        x = y = slice(None)
+        x, y = location
         for interval in intervals:
             t = slice(interval.start, interval.stop)
             yield x, y, t
@@ -78,7 +78,7 @@ class SequentialTimestampSampler(TemporalSampler):
     """
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -93,7 +93,7 @@ class SequentialTimestampSampler(TemporalSampler):
         # Ensure time intervals are unique to avoid repeats
         intervals = sorted(pd.unique(intervals))
 
-        x = y = slice(None)
+        x, y = location
         for interval in intervals:
             t = slice(interval.start, interval.stop)
             yield x, y, t
@@ -140,7 +140,7 @@ class RandomTimedeltaSampler(TemporalSampler):
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -156,7 +156,7 @@ class RandomTimedeltaSampler(TemporalSampler):
         right = intervals.right.max() - self.delta
 
         i = 0
-        x = y = slice(None)
+        x, y = location
         while i < self.length:
             tmin = self.generator.uniform(left, right)
             tmax = tmin + self.delta
@@ -195,7 +195,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
         self.stride = stride or delta
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -213,7 +213,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
         # TODO: make tile_to_chips more generic, support 1D inputs
         length = math.ceil((right - left - self.delta) / self.stride) + 1
 
-        x = y = slice(None)
+        x, y = location
         for _ in range(length):
             # TODO: ensure this doesn't escape our TOI
             interval = Interval(left, left + self.delta)
@@ -265,7 +265,7 @@ class RandomPeriodSampler(TemporalSampler):
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -287,7 +287,7 @@ class RandomPeriodSampler(TemporalSampler):
         right = Period(right, freq=self.freq).end_time
 
         i = 0
-        x = y = slice(None)
+        x, y = location
         while i < self.length:
             timestamp = self.generator.uniform(left, right)
             period = Period(timestamp, freq=self.freq)
@@ -321,7 +321,7 @@ class SequentialPeriodSampler(TemporalSampler):
         self.freq = freq
 
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
@@ -336,7 +336,7 @@ class SequentialPeriodSampler(TemporalSampler):
         left = intervals.left.min()
         right = intervals.right.max()
 
-        x = y = slice(None)
+        x, y = location
         while left < right:
             period = Period(left, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
