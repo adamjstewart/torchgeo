@@ -3,13 +3,15 @@
 
 
 import pytest
-from pandas import Timedelta, Timestamp
+from pandas import Period, Timedelta, Timestamp
 from torch.utils.data import DataLoader
 
 from torchgeo.datasets import GeoDataset
 from torchgeo.samplers import (
+    RandomPeriodSampler,
     RandomTimedeltaSampler,
     RandomTimestampSampler,
+    SequentialPeriodSampler,
     SequentialTimedeltaSampler,
     SequentialTimestampSampler,
 )
@@ -106,6 +108,52 @@ class TestSequentialTimedeltaSampler:
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
         self, dataset: GeoDataset, sampler: SequentialTimedeltaSampler, num_workers: int
+    ) -> None:
+        dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
+        for _ in dl:
+            continue
+
+
+class TestRandomPeriodSampler:
+    @pytest.fixture(scope='class')
+    def sampler(self, dataset: GeoDataset) -> RandomPeriodSampler:
+        return RandomPeriodSampler(dataset, freq='M', length=1)
+
+    def test_iter(self, sampler: RandomPeriodSampler) -> None:
+        for _, _, t in iter(sampler):
+            assert Period(t.start, freq='M') == Period('2025-4')
+            assert Period(t.stop, freq='M') == Period('2025-4')
+
+    def test_len(self, sampler: RandomPeriodSampler) -> None:
+        assert len(sampler) == 1
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize('num_workers', [0, 1, 2])
+    def test_dataloader(
+        self, dataset: GeoDataset, sampler: RandomPeriodSampler, num_workers: int
+    ) -> None:
+        dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
+        for _ in dl:
+            continue
+
+
+class TestSequentialPeriodSampler:
+    @pytest.fixture(scope='class')
+    def sampler(self, dataset: GeoDataset) -> SequentialPeriodSampler:
+        return SequentialPeriodSampler(dataset, freq='M')
+
+    def test_iter(self, sampler: SequentialPeriodSampler) -> None:
+        for _, _, t in iter(sampler):
+            assert Period(t.start, freq='M') == Period('2025-4')
+            assert Period(t.stop, freq='M') == Period('2025-4')
+
+    def test_len(self, sampler: SequentialPeriodSampler) -> None:
+        assert len(sampler) == 1
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize('num_workers', [0, 1, 2])
+    def test_dataloader(
+        self, dataset: GeoDataset, sampler: SequentialPeriodSampler, num_workers: int
     ) -> None:
         dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
         for _ in dl:

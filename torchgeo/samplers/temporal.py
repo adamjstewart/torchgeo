@@ -268,11 +268,12 @@ class RandomPeriodSampler(TemporalSampler):
             generator: Pseudo-random number generator (PRNG).
         """
         super().__init__(dataset, toi=toi)
-        self.delta = freq
+        self.freq = freq
         # TODO: should these be moved to _iter_subset? Length will change each epoch
         left = self.index.index.left.min()
         right = self.index.index.right.max()
-        self.length = length or (right - left) // Period(left, freq=freq)
+        period = Period(left, freq=freq)
+        self.length = length or (right - left) // (period.end_time - period.start_time)
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(
@@ -356,4 +357,4 @@ class SequentialPeriodSampler(TemporalSampler):
             if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
-            left = period.mid + (period.end_time - period.start_time)
+            left = interval.mid + (period.end_time - period.start_time)
