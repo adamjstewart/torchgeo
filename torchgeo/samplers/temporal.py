@@ -9,7 +9,7 @@ from collections.abc import Iterator
 import numpy as np
 import pandas as pd
 from numpy.random import BitGenerator, Generator, RandomState, SeedSequence
-from pandas import Interval, Period, Timedelta
+from pandas import Interval, Period, Timedelta, Timestamp
 
 from ..datasets import GeoDataset
 from ..datasets.utils import GeoSlice
@@ -164,10 +164,11 @@ class RandomTimedeltaSampler(TemporalSampler):
         i = 0
         x, y = location
         while i < self.length:
-            tmin = self.generator.uniform(left, right)
+            ts = self.generator.uniform(left.timestamp(), right.timestamp())
+            tmin = Timestamp.fromtimestamp(ts)
             tmax = tmin + self.delta
             interval = Interval(tmin, tmax)
-            if intervals.overlaps(interval):
+            if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
                 i += 1
@@ -225,7 +226,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
         for _ in range(length):
             # TODO: ensure this doesn't escape our TOI
             interval = Interval(left, left + self.delta)
-            if intervals.overlaps(interval):
+            if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
             left += self.delta
@@ -299,10 +300,10 @@ class RandomPeriodSampler(TemporalSampler):
         i = 0
         x, y = location
         while i < self.length:
-            timestamp = self.generator.uniform(left, right)
-            period = Period(timestamp, freq=self.freq)
+            ts = self.generator.uniform(left.timestamp(), right.timestamp())
+            period = Period(Timestamp.fromtimestamp(ts), freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
-            if intervals.overlaps(interval):
+            if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
                 i += 1
@@ -352,7 +353,7 @@ class SequentialPeriodSampler(TemporalSampler):
         while left < right:
             period = Period(left, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
-            if intervals.overlaps(interval):
+            if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
             left = period.mid + (period.end_time - period.start_time)

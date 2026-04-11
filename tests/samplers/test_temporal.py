@@ -7,7 +7,12 @@ from pandas import Timedelta, Timestamp
 from torch.utils.data import DataLoader
 
 from torchgeo.datasets import GeoDataset
-from torchgeo.samplers import RandomTimestampSampler, SequentialTimestampSampler
+from torchgeo.samplers import (
+    RandomTimedeltaSampler,
+    RandomTimestampSampler,
+    SequentialTimedeltaSampler,
+    SequentialTimestampSampler,
+)
 
 TMIN = Timestamp(2025, 4, 1)
 TMAX = Timestamp(2025, 4, 30)
@@ -19,9 +24,9 @@ class TestRandomTimestampSampler:
         return RandomTimestampSampler(dataset)
 
     def test_iter(self, sampler: RandomTimestampSampler) -> None:
-        _, _, t = next(iter(sampler))
-        assert TMIN <= t.start < t.stop <= TMAX
-        assert t.stop - t.start == Timedelta('1D')
+        for _, _, t in iter(sampler):
+            assert TMIN <= t.start < t.stop <= TMAX
+            assert t.stop - t.start == Timedelta('1D')
 
     def test_len(self, sampler: RandomTimestampSampler) -> None:
         assert len(sampler) == 3
@@ -42,9 +47,9 @@ class TestSequentialTimestampSampler:
         return SequentialTimestampSampler(dataset)
 
     def test_iter(self, sampler: SequentialTimestampSampler) -> None:
-        _, _, t = next(iter(sampler))
-        assert TMIN <= t.start < t.stop <= TMAX
-        assert t.stop - t.start == Timedelta('1D')
+        for _, _, t in iter(sampler):
+            assert TMIN <= t.start < t.stop <= TMAX
+            assert t.stop - t.start == Timedelta('1D')
 
     def test_len(self, sampler: SequentialTimestampSampler) -> None:
         assert len(sampler) == 3
@@ -53,6 +58,54 @@ class TestSequentialTimestampSampler:
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
         self, dataset: GeoDataset, sampler: SequentialTimestampSampler, num_workers: int
+    ) -> None:
+        dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
+        for _ in dl:
+            continue
+
+
+class TestRandomTimedeltaSampler:
+    @pytest.fixture(scope='class')
+    def sampler(self, dataset: GeoDataset) -> RandomTimedeltaSampler:
+        delta = Timedelta('1W')
+        return RandomTimedeltaSampler(dataset, delta=delta)
+
+    def test_iter(self, sampler: RandomTimedeltaSampler) -> None:
+        for _, _, t in iter(sampler):
+            assert TMIN <= t.start < t.stop <= TMAX
+            assert t.stop - t.start == Timedelta('1W')
+
+    def test_len(self, sampler: RandomTimedeltaSampler) -> None:
+        assert len(sampler) == 4
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize('num_workers', [0, 1, 2])
+    def test_dataloader(
+        self, dataset: GeoDataset, sampler: RandomTimedeltaSampler, num_workers: int
+    ) -> None:
+        dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
+        for _ in dl:
+            continue
+
+
+class TestSequentialTimedeltaSampler:
+    @pytest.fixture(scope='class')
+    def sampler(self, dataset: GeoDataset) -> SequentialTimedeltaSampler:
+        delta = Timedelta('1W')
+        return SequentialTimedeltaSampler(dataset, delta=delta)
+
+    def test_iter(self, sampler: SequentialTimedeltaSampler) -> None:
+        for _, _, t in iter(sampler):
+            assert TMIN <= t.start < t.stop <= TMAX
+            assert t.stop - t.start == Timedelta('1W')
+
+    def test_len(self, sampler: SequentialTimedeltaSampler) -> None:
+        assert len(sampler) == 4
+
+    @pytest.mark.slow
+    @pytest.mark.parametrize('num_workers', [0, 1, 2])
+    def test_dataloader(
+        self, dataset: GeoDataset, sampler: SequentialTimedeltaSampler, num_workers: int
     ) -> None:
         dl = DataLoader(dataset, sampler=sampler, num_workers=num_workers)
         for _ in dl:
