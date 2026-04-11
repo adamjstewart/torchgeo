@@ -8,7 +8,9 @@ from abc import ABC
 from collections.abc import Iterator
 from typing import Literal
 
-from pandas import Interval
+import numpy as np
+from geopandas import GeoDataFrame
+from pandas import Interval, IntervalIndex
 from shapely import Polygon
 from torch.utils.data import Sampler
 
@@ -119,7 +121,15 @@ class TemporalSampler(GeoSampler):
         self.index = dataset.index
 
         if toi:
-            self.index = self.index.iloc[self.index.index.overlaps(toi)]
+            tmin = np.maximum(toi.left, self.index.index.left)
+            tmax = np.minimum(toi.right, self.index.index.right)
+            valid = tmax >= tmin
+            tmin = tmin[valid]
+            tmax = tmax[valid]
+            self.index = self.index[valid]
+            self.index.index = IntervalIndex.from_arrays(
+                tmin, tmax, closed='both', name='datetime'
+            )
 
     def __iter__(self) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
@@ -128,6 +138,27 @@ class TemporalSampler(GeoSampler):
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
         yield from self._iter_subset()
+
+    def _init_subset(
+        self, index: GeoDataFrame, location: tuple[slice, slice] | None = None
+    ) -> IntervalIndex:
+        """Narrow down index to a specific location.
+
+        Args:
+            index: A GeoDataset index.
+            location: A specific location.
+
+        Returns:
+            A subset of *index* at *location*.
+        """
+        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
+        if location:
+            # Since this only occurs in combination with a SpatialSampler, x and y are
+            # guaranteed to have start and stop, and t is guaranteed to be empty
+            x, y = location
+            index = index.cx[x.start : x.stop, y.start : y.stop]
+
+        return index.index
 
     @abc.abstractmethod
     def _iter_subset(
@@ -177,11 +208,11 @@ class SpatioTemporalSampler(GeoSampler):
             case 'random', 'random':
                 for _ in range(len(self)):
                     location = next(iter(self.spatial_sampler))
-                    index = next(iter(self.temporal_sampler._subset_iter(location)))
+                    index = next(iter(self.temporal_sampler._iter_subset(location)))
                     yield index
             case 'sequential', 'sequential':
                 for location in self.spatial_sampler:
-                    for index in self.temporal_sampler._subset_iter(location):
+                    for index in self.temporal_sampler._iter_subset(location):
                         yield index
             # TODO: random-sequential, sequential-random
 

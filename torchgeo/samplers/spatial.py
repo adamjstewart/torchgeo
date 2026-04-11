@@ -94,7 +94,7 @@ class RandomSpatialSampler(SpatialSampler):
         """
         # Ensure a new set of random points for each epoch
         series = GeoSeries([self.geometry])
-        points = series.sample_points(size=self.length, rng=self.generator)
+        points = series.sample_points(size=self.length, rng=self.generator).explode()
 
         for point in points:
             # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more

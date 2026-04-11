@@ -57,21 +57,13 @@ class RandomTimestampSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
-
-        intervals = index.index
+        intervals = self._init_subset(self.index)
 
         # Ensure time intervals are unique
         # Allows all intervals to be equally weighted, regardless of # locations
         intervals = pd.unique(intervals)
 
-        intervals = intervals.sample(frac=1, random_state=self.generator)
+        intervals = intervals.to_series().sample(frac=1, random_state=self.generator)
 
         x = y = slice(None)
         for interval in intervals:
@@ -96,15 +88,7 @@ class SequentialTimestampSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
-
-        intervals = index.index
+        intervals = self._init_subset(self.index)
 
         # Ensure time intervals are unique to avoid repeats
         intervals = sorted(pd.unique(intervals))
@@ -166,16 +150,10 @@ class RandomTimedeltaSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
+        intervals = self._init_subset(self.index)
 
-        left = index.index.left.min()
-        right = index.index.right.max() - self.delta
+        left = intervals.left.min()
+        right = intervals.right.max() - self.delta
 
         i = 0
         x = y = slice(None)
@@ -183,7 +161,7 @@ class RandomTimedeltaSampler(TemporalSampler):
             tmin = self.generator.uniform(left, right)
             tmax = tmin + self.delta
             interval = Interval(tmin, tmax)
-            if index.index.overlaps(interval):
+            if intervals.overlaps(interval):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
                 i += 1
@@ -227,16 +205,10 @@ class SequentialTimedeltaSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
+        intervals = self._init_subset(self.index)
 
-        left = index.index.left.min()
-        right = index.index.right.max() - self.delta
+        left = intervals.left.min()
+        right = intervals.right.max() - self.delta
 
         # TODO: make tile_to_chips more generic, support 1D inputs
         length = math.ceil((right - left - self.delta) / self.stride) + 1
@@ -245,7 +217,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
         for _ in range(length):
             # TODO: ensure this doesn't escape our TOI
             interval = Interval(left, left + self.delta)
-            if index.index.overlaps(interval):
+            if intervals.overlaps(interval):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
             left += self.delta
@@ -303,16 +275,10 @@ class RandomPeriodSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
+        intervals = self._init_subset(self.index)
 
-        left = index.index.left.min()
-        right = index.index.right.max()
+        left = intervals.left.min()
+        right = intervals.right.max()
 
         # Expand to full period to support balanced sampling
         # E.g., if data is from summer 2024 to summer 2026, we don't want to sample
@@ -326,7 +292,7 @@ class RandomPeriodSampler(TemporalSampler):
             timestamp = self.generator.uniform(left, right)
             period = Period(timestamp, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
-            if index.index.overlaps(interval):
+            if intervals.overlaps(interval):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
                 i += 1
@@ -365,22 +331,16 @@ class SequentialPeriodSampler(TemporalSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        index = self.index
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
+        intervals = self._init_subset(self.index)
 
-        left = index.index.left.min()
-        right = index.index.right.max()
+        left = intervals.left.min()
+        right = intervals.right.max()
 
         x = y = slice(None)
         while left < right:
             period = Period(left, freq=self.freq)
             interval = Interval(period.start_time, period.end_time)
-            if index.index.overlaps(interval):
+            if intervals.overlaps(interval):
                 t = slice(interval.start, interval.stop)
                 yield x, y, t
             left = period.mid + (period.end_time - period.start_time)
