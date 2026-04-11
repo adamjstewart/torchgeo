@@ -140,7 +140,9 @@ class TemporalSampler(GeoSampler):
         yield from self._iter_subset()
 
     def _init_subset(
-        self, index: GeoDataFrame, location: tuple[slice, slice] | None = None
+        self,
+        index: GeoDataFrame,
+        location: tuple[slice, slice] = (slice(None), slice(None)),
     ) -> IntervalIndex:
         """Narrow down index to a specific location.
 
@@ -162,7 +164,7 @@ class TemporalSampler(GeoSampler):
 
     @abc.abstractmethod
     def _iter_subset(
-        self, location: tuple[slice, slice] | None = None
+        self, location: tuple[slice, slice] = (slice(None), slice(None))
     ) -> Iterator[GeoSlice]:
         """Iterate over generated sample locations for each epoch.
 
