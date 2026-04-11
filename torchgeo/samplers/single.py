@@ -310,7 +310,7 @@ class GridGeoSampler(GeoSampler):
         return self.length
 
 
-@deprecated('Use torchgeo.samplers.RandomSpatialSampler instead')
+@deprecated('Use torchgeo.samplers.GridSpatialSampler instead')
 class PreChippedGeoSampler(GeoSampler):
     """Samples entire files at a time.
 
