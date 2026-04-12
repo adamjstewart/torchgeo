@@ -122,8 +122,8 @@ class TemporalSampler(GeoSampler):
         self.index = dataset.index
 
         if toi:
-            tmin = np.maximum(toi.left, self.index.index.left)
-            tmax = np.minimum(toi.right, self.index.index.right)
+            tmin = np.maximum(toi.left.to_datetime64(), self.index.index.left)
+            tmax = np.minimum(toi.right.to_datetime64(), self.index.index.right)
             valid = tmax >= tmin
             tmin = tmin[valid]
             tmax = tmax[valid]
