@@ -1,7 +1,6 @@
 # Copyright (c) TorchGeo Contributors. All rights reserved.
 # Licensed under the MIT License.
 
-
 import pytest
 from pandas import Period, Timedelta, Timestamp
 from torch.utils.data import DataLoader

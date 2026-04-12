@@ -38,7 +38,7 @@ Some datasets have static mosaics, and only spatial sampling is important. Other
    from torchgeo.datasets import Landsat
    from torchgeo.samplers import GridSpatialSampler, SequentialPeriodSampler
 
-   dataset = Landsat(...)
+   dataset = Landsat(..., time_series=True)
    spatial_sampler = GridSpatialSampler(dataset, size=256, stride=128)
    temporal_sampler = SequentialPeriodSampler(dataset, freq='Y')
    spatiotemporal_sampler = spatial_sampler @ temporal_sampler
@@ -53,6 +53,7 @@ Spatial Samplers
 ^^^^^^^^^^^^^^^^
 
 .. autosummary::
+   :nosignatures:
 
    RandomSpatialSampler
    GridSpatialSampler
@@ -61,6 +62,7 @@ Temporal Samplers
 ^^^^^^^^^^^^^^^^^
 
 .. autosummary::
+   :nosignatures:
 
    RandomTimestampSampler
    SequentialTimestampSampler
@@ -75,6 +77,7 @@ Base Classes
 If you want to write your own custom sampler, you can extend one of these abstract base classes.
 
 .. autosummary::
+   :nosignatures:
 
    GeoSampler
    SpatialSampler

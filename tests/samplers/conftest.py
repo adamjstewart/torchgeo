@@ -1,7 +1,6 @@
 # Copyright (c) TorchGeo Contributors. All rights reserved.
 # Licensed under the MIT License.
 
-
 import pytest
 import shapely
 from geopandas import GeoDataFrame

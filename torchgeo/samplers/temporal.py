@@ -16,7 +16,7 @@ from .base import TemporalSampler
 
 
 class RandomTimestampSampler(TemporalSampler):
-    """Sample individual timestamps from a time of interest randomly.
+    """Random sampling of single images (:class:`~pandas.Timestamp`).
 
     .. versionadded:: 0.10
     """
@@ -73,7 +73,7 @@ class RandomTimestampSampler(TemporalSampler):
 
 
 class SequentialTimestampSampler(TemporalSampler):
-    """Sample individual timestamps from a time of interest in order.
+    """Sequential sampling of single images (:class:`~pandas.Timestamp`).
 
     .. versionadded:: 0.10
     """
@@ -103,7 +103,7 @@ class SequentialTimestampSampler(TemporalSampler):
 
 
 class RandomTimedeltaSampler(TemporalSampler):
-    """Sample sliding window timedeltas from a time of interest randomly.
+    """Random sampling of fixed-length sliding windows (:class:`~pandas.Timedelta`).
 
     .. versionadded:: 0.10
     """
@@ -174,7 +174,7 @@ class RandomTimedeltaSampler(TemporalSampler):
 
 
 class SequentialTimedeltaSampler(TemporalSampler):
-    """Sample sliding window timedeltas from a time of interest sequentially.
+    """Sequential sampling of fixed-length sliding windows (:class:`~pandas.Timedelta`).
 
     .. versionadded:: 0.10
     """
@@ -232,7 +232,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
 
 
 class RandomPeriodSampler(TemporalSampler):
-    """Sample fixed window periods from a time of interest randomly.
+    """Random sampling of fixed-length fixed windows (:class:`~pandas.Period`).
 
     .. versionadded:: 0.10
     """
@@ -310,7 +310,7 @@ class RandomPeriodSampler(TemporalSampler):
 
 
 class SequentialPeriodSampler(TemporalSampler):
-    """Sample fixed window periods from a time of interest sequentially.
+    """Sequential sampling of fixed-length fixed windows (:class:`~pandas.Period`).
 
     .. versionadded:: 0.10
     """
