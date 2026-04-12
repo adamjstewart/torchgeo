@@ -1,7 +1,14 @@
 torchgeo.samplers
 =================
 
-.. automodule:: torchgeo.samplers
+.. module:: torchgeo.samplers
+
+.. toctree::
+   :maxdepth: 0
+   :hidden:
+   :glob:
+
+   samplers/*
 
 Samplers
 --------
