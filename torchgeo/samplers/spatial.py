@@ -15,7 +15,7 @@ from shapely import Polygon
 from ..datasets import GeoDataset
 from .base import SpatialSampler
 from .constants import Units
-from .utils import _to_tuple, tile_to_chips
+from .utils import _to_tuple, convolution_arithmetic
 
 
 class RandomSpatialSampler(SpatialSampler):
@@ -76,8 +76,9 @@ class RandomSpatialSampler(SpatialSampler):
             self.size = (self.size[0] * dataset.res[1], self.size[1] * dataset.res[0])
 
         # Default to approximate number of non-overlapping patches
+        total_area = shapely.area(self.geometry)
         patch_area = self.size[0] * self.size[1]
-        self.length = length or int(shapely.area(self.geometry) // patch_area)
+        self.length = length or convolution_arithmetic(total_area, patch_area)
 
         # Erosion to avoid out-of-bounds sampling
         # Purposefully conservative radius calculation
@@ -169,21 +170,23 @@ class GridSpatialSampler(SpatialSampler):
         Yields:
             [xmin:xmax, ymin:ymax] coordinates to index a dataset.
         """
-        bounds = self.geometry.bounds
+        xmin, ymin, xmax, ymax = self.geometry.bounds
 
         # TODO: adjust xmin/ymin to have equal spacing in case of non-integer multiple
         # xmid, ymid = self.geometry.centroid
+        # TODO: but ensure we remain snapped to the pixel grid...
 
-        rows, cols = tile_to_chips(bounds, self.size, self.stride)
+        rows = convolution_arithmetic(ymax - ymin, self.size[0], self.stride[0])
+        cols = convolution_arithmetic(xmax - xmin, self.size[1], self.stride[1])
 
         # For each row...
         for i in range(rows):
-            ymin = bounds[1] + i * self.stride[0]
+            ymin = self.geometry.bounds[1] + i * self.stride[0]
             ymax = ymin + self.size[0]
 
             # For each column...
             for j in range(cols):
-                xmin = bounds[0] + j * self.stride[1]
+                xmin = self.geometry.bounds[0] + j * self.stride[1]
                 xmax = xmin + self.size[1]
 
                 # Check for intersection

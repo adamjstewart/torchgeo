@@ -77,7 +77,7 @@ class TestRandomTimedeltaSampler:
             assert t.stop - t.start == Timedelta('1W')
 
     def test_len(self, sampler: RandomTimedeltaSampler) -> None:
-        assert len(sampler) == 4
+        assert len(sampler) == 5
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
@@ -97,11 +97,11 @@ class TestSequentialTimedeltaSampler:
 
     def test_iter(self, sampler: SequentialTimedeltaSampler) -> None:
         for _, _, t in iter(sampler):
-            assert TMIN <= t.start < t.stop <= TMAX
+            assert TMIN <= t.start < t.stop < TMAX + sampler.delta
             assert t.stop - t.start == Timedelta('1W')
 
     def test_len(self, sampler: SequentialTimedeltaSampler) -> None:
-        assert len(sampler) == 4
+        assert len(sampler) == 5
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])

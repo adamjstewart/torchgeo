@@ -3,7 +3,6 @@
 
 """Temporal sampling routines."""
 
-import math
 from collections.abc import Iterator
 
 import numpy as np
@@ -13,6 +12,7 @@ from pandas import Interval, Period, Timedelta, Timestamp
 
 from ..datasets import GeoDataset
 from .base import TemporalSampler
+from .utils import convolution_arithmetic
 
 
 class RandomTimestampSampler(TemporalSampler):
@@ -141,7 +141,7 @@ class RandomTimedeltaSampler(TemporalSampler):
         # TODO: should these be moved to _iter_subset? Length will change each epoch
         left = self.index.index.left.min()
         right = self.index.index.right.max()
-        self.length = length or (right - left) // delta
+        self.length = length or convolution_arithmetic(right - left, delta)
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(
@@ -216,10 +216,8 @@ class SequentialTimedeltaSampler(TemporalSampler):
         intervals = self._init_subset(location)
 
         left = intervals.left.min()
-        right = intervals.right.max() - self.delta
-
-        # TODO: make tile_to_chips more generic, support 1D inputs
-        length = math.ceil((right - left - self.delta) / self.stride) + 1
+        right = intervals.right.max()
+        length = convolution_arithmetic(right - left, self.delta)
 
         x, y = location
         for _ in range(length):
@@ -272,7 +270,8 @@ class RandomPeriodSampler(TemporalSampler):
         left = self.index.index.left.min()
         right = self.index.index.right.max()
         period = Period(left, freq=freq)
-        self.length = length or (right - left) // (period.end_time - period.start_time)
+        window = period.end_time - period.start_time
+        self.length = length or convolution_arithmetic(right - left, window)
         self.generator = np.random.default_rng(generator)
 
     def _iter_subset(

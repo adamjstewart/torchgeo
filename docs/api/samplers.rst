@@ -84,11 +84,6 @@ If you want to write your own custom sampler, you can extend one of these abstra
    TemporalSampler
    SpatioTemporalSampler
 
-Utilities
----------
-
-.. autofunction:: tile_to_chips
-
 Units
 -----
 

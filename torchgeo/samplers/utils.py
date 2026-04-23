@@ -7,6 +7,7 @@ import math
 from typing import overload
 
 import torch
+from pandas import Timedelta
 from torch import Generator
 from typing_extensions import deprecated
 
@@ -80,6 +81,7 @@ def get_random_bounding_box(
     return slice(xmin, xmax), slice(ymin, ymax)
 
 
+@deprecated('Use torchgeo.samplers.utils.convolution_arithmetic instead')
 def tile_to_chips(
     bounds: tuple[float, float, float, float],
     size: tuple[float, float],
@@ -122,3 +124,38 @@ def tile_to_chips(
     cols = math.ceil((xmax - xmin - size[1]) / stride[1]) + 1
 
     return rows, cols
+
+
+def convolution_arithmetic[T: (float, Timedelta)](
+    input_size: T, kernel_size: T, stride: T | None = None
+) -> int:
+    r"""Compute number of spatial/temporal windows that can be sampled via convolution.
+
+    Let :math:`i` be the size of the input window.
+    Let :math:`k` be the requested size of the output window.
+    Let :math:`s` be the requested stride.
+    Let :math:`o` be the number of output windows sampled from each input.
+
+    :math:`o` can then be computed as:
+
+    .. math::
+
+       o = \left\lceil \frac{i - k}{s} \right\rceil + 1
+
+    This is almost identical to relationship 5 in
+    https://doi.org/10.48550/arXiv.1603.07285. However, we use ceiling instead of floor
+    because we want to include the final remaining window in each input when
+    *input_size* is not an integer multiple of *stride*.
+
+    Args:
+        input_size: Size of the input window.
+        kernel_size: Size of each output window.
+        stride: Stride with which to sample (defaults to *input_size*).
+
+    Returns:
+        The number of output windows that can be sampled.
+
+    .. versionadded:: 0.10
+    """
+    stride = stride or kernel_size
+    return math.ceil((input_size - kernel_size) / stride) + 1
