@@ -82,7 +82,7 @@ class SpatialSampler(GeoSampler):
         # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
         self.geometry = dataset.index.geometry.union_all()
 
-        if roi:
+        if roi is not None:
             self.geometry &= roi
 
     @abc.abstractmethod
