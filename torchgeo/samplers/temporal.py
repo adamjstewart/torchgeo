@@ -226,7 +226,7 @@ class SequentialTimedeltaSampler(TemporalSampler):
             if intervals.overlaps(interval).any():
                 t = slice(interval.left, interval.right)
                 yield x, y, t
-            left += self.delta
+            left += self.stride
 
 
 class RandomPeriodSampler(TemporalSampler):
