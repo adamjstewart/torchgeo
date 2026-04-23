@@ -79,7 +79,6 @@ class SpatialSampler(GeoSampler):
         """
         # Create one single MultiPolygon of all objects
         # Allows all locations to be equally weighted, regardless of # time stamps
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
         self.geometry = dataset.index.geometry.union_all()
 
         if roi is not None:
@@ -153,12 +152,10 @@ class TemporalSampler(GeoSampler):
         """
         index = self.index
 
-        # TODO: ensure we aren't modifying dataset.index too, may need to deepcopy
-        if location:
-            # Since this only occurs in combination with a SpatialSampler, x and y are
-            # guaranteed to have start and stop, and t is guaranteed to be empty
-            x, y = location
-            index = index.cx[x.start : x.stop, y.start : y.stop]
+        # Since this only occurs in combination with a SpatialSampler, x and y are
+        # guaranteed to have start and stop, and t is guaranteed to be empty
+        x, y = location
+        index = index.cx[x.start : x.stop, y.start : y.stop]
 
         return index.index  # ty: ignore[invalid-return-type]
 
