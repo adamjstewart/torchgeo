@@ -319,7 +319,7 @@ class SequentialPeriodSampler(TemporalSampler):
     def __init__(
         self, dataset: GeoDataset, *, freq: str, toi: Interval | None = None
     ) -> None:
-        """Initialize a new SequentialTimedeltaSampler instance.
+        """Initialize a new SequentialPeriodSampler instance.
 
         Args:
             dataset: Dataset to sample from.
