@@ -158,4 +158,4 @@ def convolution_arithmetic[T: (float, Timedelta)](
     .. versionadded:: 0.10
     """
     stride = stride or kernel_size
-    return math.ceil((input_size - kernel_size) / stride) + 1
+    return math.ceil((input_size - kernel_size) / stride) + 1  # ty: ignore[no-matching-overload]
