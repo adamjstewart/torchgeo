@@ -83,7 +83,6 @@ class RandomSpatialSampler(SpatialSampler):
 
         # Erosion to avoid out-of-bounds sampling
         # Purposefully conservative radius calculation
-        # TODO: 99% of the time, our geometry is a rectangle, is this too conservative?
         # TODO: this operation removes Point and LineString, should we keep these?
         distance = math.sqrt((self.size[0] / 2) ** 2 + (self.size[1] / 2) ** 2)
         self.geometry = shapely.buffer(self.geometry, -distance)
@@ -99,6 +98,7 @@ class RandomSpatialSampler(SpatialSampler):
         points = series.sample_points(size=self.length, rng=self.generator)
 
         # Points are random, but order is not
+        # Remove once https://github.com/geopandas/geopandas/pull/3773 is in min version
         points = points.explode().sample(frac=1, random_state=self.generator)
 
         # Snap to pixel grid
