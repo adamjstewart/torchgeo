@@ -96,7 +96,10 @@ class RandomSpatialSampler(SpatialSampler):
         """
         # Ensure a new set of random points for each epoch
         series = GeoSeries([self.geometry])
-        points = series.sample_points(size=self.length, rng=self.generator).explode()
+        points = series.sample_points(size=self.length, rng=self.generator)
+
+        # Points are random, but order is not
+        points = points.explode().sample(frac=1, random_state=self.generator)
 
         # Snap to pixel grid
         xmin, ymin, _, _ = self.bounds
