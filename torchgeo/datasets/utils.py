@@ -822,8 +822,8 @@ def percentile_normalization(
     .. versiondeprecated:: 0.10
     """
     assert lower < upper
-    lower_percentile = np.percentile(img[img > 0], lower, axis=axis)
-    upper_percentile = np.percentile(img[img > 0], upper, axis=axis)
+    lower_percentile = np.percentile(img[img != 0], lower, axis=axis)
+    upper_percentile = np.percentile(img[img != 0], upper, axis=axis)
     img_normalized = np.clip(
         (img - lower_percentile) / (upper_percentile - lower_percentile + 1e-5), 0, 1
     )
@@ -849,8 +849,8 @@ def quantile_normalization(
 
     .. versionadded:: 0.10
     """
-    lower = torch.quantile(img[img > 0], lower, dim, interpolation='higher')
-    upper = torch.quantile(img[img > 0], upper, dim, interpolation='lower')
+    lower = torch.quantile(img[img != 0], lower, dim, interpolation='higher')
+    upper = torch.quantile(img[img != 0], upper, dim, interpolation='lower')
     img = (img - lower) / (upper - lower + 1e-5)
     return torch.clamp(img, 0, 1)
 
