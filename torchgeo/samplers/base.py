@@ -80,6 +80,8 @@ class SpatialSampler(GeoSampler):
         # Create one single MultiPolygon of all objects
         # Allows all locations to be equally weighted, regardless of # time stamps
         self.geometry = dataset.index.geometry.union_all()
+        self.bounds = self.geometry.bounds
+        self.res = dataset.res
 
         if roi is not None:
             self.geometry &= roi

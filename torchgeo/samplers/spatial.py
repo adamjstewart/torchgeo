@@ -6,6 +6,7 @@
 import math
 from collections.abc import Iterator
 
+import geopandas as gpd
 import numpy as np
 import shapely
 from geopandas import GeoSeries
@@ -82,6 +83,7 @@ class RandomSpatialSampler(SpatialSampler):
 
         # Erosion to avoid out-of-bounds sampling
         # Purposefully conservative radius calculation
+        # TODO: 99% of the time, our geometry is a rectangle, is this too conservative?
         # TODO: this operation removes Point and LineString, should we keep these?
         distance = math.sqrt((self.size[0] / 2) ** 2 + (self.size[1] / 2) ** 2)
         self.geometry = shapely.buffer(self.geometry, -distance)
@@ -96,13 +98,24 @@ class RandomSpatialSampler(SpatialSampler):
         series = GeoSeries([self.geometry])
         points = series.sample_points(size=self.length, rng=self.generator).explode()
 
+        # Snap to pixel grid
+        xmin, ymin, _, _ = self.bounds
+        # Convert from geospatial coords to pixel coords
+        points = points.translate(-xmin - self.size[1] / 2, -ymin - self.size[0] / 2)
+        points = points.scale(1 / self.res[0], 1 / self.res[1], origin=(0, 0))
+        # Round to the nearest pixel
+        x = points.x.round()
+        y = points.y.round()
+        # Convert from pixel coords to geospatial coords
+        points = gpd.points_from_xy(x, y)
+        points = points.scale(self.res[0], self.res[1], origin=(0, 0))
+        points = points.translate(xmin, ymin)
+
         for point in points:
-            # TODO: snap to pixel grid? How? Can use outer geometry, but not file-specific, users will have to use TAP more
-            # IDEA: snap to pixel grid in RasterDataset, not here. Or maybe that would be incredibly confusing...
-            xmin = point.x - self.size[1] / 2
-            xmax = point.x + self.size[1] / 2
-            ymin = point.y - self.size[0] / 2
-            ymax = point.y + self.size[0] / 2
+            xmin = point.x
+            xmax = point.x + self.size[1]
+            ymin = point.y
+            ymax = point.y + self.size[0]
             yield slice(xmin, xmax), slice(ymin, ymax)
 
 
