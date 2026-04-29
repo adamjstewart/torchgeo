@@ -263,7 +263,7 @@ class IDTReeS(NonGeoDataset):
         """
         with rasterio.open(path) as f:
             array = f.read(out_shape=self.image_size, resampling=Resampling.bilinear)
-        tensor = torch.from_numpy(array)
+        tensor = torch.from_numpy(array).float()
         return tensor
 
     def _load_las(self, path: Path) -> Tensor:
