@@ -28,6 +28,7 @@ import pandas as pd
 import rasterio
 import shapely.affinity
 import torch
+from numpy.typing import NDArray
 from pandas import Timedelta, Timestamp
 from rasterio import Affine
 from shapely import Geometry
@@ -797,11 +798,11 @@ def rgb_to_mask(
 
 @deprecated('Use torchgeo.datasets.utils.quantile_normalization instead')
 def percentile_normalization(
-    img: np.typing.NDArray[np.int_],
+    img: NDArray,
     lower: float = 2,
     upper: float = 98,
     axis: int | Sequence[int] | None = None,
-) -> np.typing.NDArray[np.int_]:
+) -> NDArray:
     """Applies percentile normalization to an input image.
 
     Specifically, this will rescale the values in the input such that values <= the
@@ -818,9 +819,15 @@ def percentile_normalization(
     Returns:
         normalized version of ``img``
 
+    Raises:
+        AssertionError: If *lower* is higher than *upper*.
+
     .. versionadded:: 0.2
     .. versiondeprecated:: 0.10
     """
+    if not np.any(img):
+        return img
+
     assert lower < upper
     lower_percentile = np.percentile(img[img != 0], lower, axis=axis)
     upper_percentile = np.percentile(img[img != 0], upper, axis=axis)
@@ -849,6 +856,9 @@ def quantile_normalization(
 
     .. versionadded:: 0.10
     """
+    if torch.count_nonzero(img) == 0:
+        return img
+
     lower = torch.quantile(img[img != 0], lower, dim, interpolation='higher')
     upper = torch.quantile(img[img != 0], upper, dim, interpolation='lower')
     img = (img - lower) / (upper - lower + 1e-5)
