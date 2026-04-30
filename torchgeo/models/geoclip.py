@@ -6,8 +6,6 @@
 
 """GeoCLIP models."""
 
-import os
-
 import numpy as np
 import pandas as pd
 import torch
@@ -15,6 +13,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
 from torch import Tensor
+from torchvision import transforms
+from torchvision.models._api import Weights, WeightsEnum
 from transformers import AutoProcessor, CLIPModel
 
 # Constants
@@ -164,38 +164,18 @@ class GeoCLIP(nn.Module):
     .. versionadded:: 0.10
     """
 
-    def __init__(self, from_pretrained: bool = False, queue_size: int = 4096) -> None:
+    def __init__(self, queue_size: int = 4096) -> None:
         """Initialize a new GeoCLIP instance.
 
         Args:
-            from_pretrained: True for a pre-trained model, else False.
             queue_size: Size of the GPS queue.
         """
         super().__init__()
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
         self.image_encoder = ImageEncoder()
         self.location_encoder = LocationEncoder()
-
-        self.gps_gallery = load_gps_data(
-            os.path.join(file_dir, 'gps_gallery', 'coordinates_100K.csv')
-        )
+        self.gps_gallery = torch.tensor([[-50.943392, -72.935664]])
         self._initialize_gps_queue(queue_size)
-
-        if from_pretrained:
-            self.weights_folder = os.path.join(file_dir, 'weights')
-            self._load_weights()
-
-    def _load_weights(self) -> None:
-        """Load pre-trained model weights."""
-        self.image_encoder.mlp.load_state_dict(
-            torch.load(f'{self.weights_folder}/image_encoder_mlp_weights.pth')
-        )
-        self.location_encoder.load_state_dict(
-            torch.load(f'{self.weights_folder}/location_encoder_weights.pth')
-        )
-        self.logit_scale = nn.Parameter(
-            torch.load(f'{self.weights_folder}/logit_scale_weights.pth')
-        )
 
     def _initialize_gps_queue(self, queue_size: int) -> None:
         """Initialize the GPS queue.
@@ -296,22 +276,11 @@ class ImageEncoder(nn.Module):
     .. versionadded:: 0.10
     """
 
-    def __init__(self, from_pretrained: bool = False) -> None:
-        """Initialize a new ImageEncoder instance.
-
-        Args:
-            from_pretrained: True for a pre-trained model, else False.
-        """
+    def __init__(self) -> None:
+        """Initialize a new ImageEncoder instance."""
         super().__init__()
-        if from_pretrained:
-            self.CLIP = CLIPModel.from_pretrained('openai/clip-vit-large-patch14')
-            self.image_processor = AutoProcessor.from_pretrained(
-                'openai/clip-vit-large-patch14'
-            )
-        else:
-            self.CLIP = CLIPModel()
-            self.image_processor = AutoProcessor()
-
+        self.CLIP = CLIPModel()
+        self.image_processor = AutoProcessor()
         self.mlp = nn.Sequential(nn.Linear(768, 768), nn.ReLU(), nn.Linear(768, 512))
 
         # Freeze CLIP
@@ -385,14 +354,11 @@ class LocationEncoder(nn.Module):
     .. versionadded:: 0.10
     """
 
-    def __init__(
-        self, sigma: list[float] = [2**0, 2**4, 2**8], from_pretrained: bool = True
-    ) -> None:
+    def __init__(self, sigma: list[float] = [2**0, 2**4, 2**8]) -> None:
         """Initialize a new LocationEncoder instance.
 
         Args:
             sigma: Standard deviation of each MLP block.
-            from_pretrained: True for a pre-trained model, else False.
         """
         super().__init__()
         self.sigma = sigma
@@ -400,15 +366,6 @@ class LocationEncoder(nn.Module):
 
         for i, s in enumerate(self.sigma):
             self.add_module('LocEnc' + str(i), LocationEncoderCapsule(sigma=s))
-
-        if from_pretrained:
-            self._load_weights()
-
-    def _load_weights(self) -> None:
-        """Load pre-trained model weights."""
-        self.load_state_dict(
-            torch.load(f'{file_dir}/weights/location_encoder_weights.pth')
-        )
 
     def forward(self, location: Tensor) -> Tensor:
         """Forward pass of the location encoder.
@@ -531,3 +488,101 @@ class PositionalEncoding(nn.Module):
             Mapped tensor of shape :math:`(N, *, 2 \cdot m \cdot \text{input_size})`.
         """
         return positional_encoding(v, self.sigma, self.m)
+
+
+class GeoCLIP_Weights(WeightsEnum):
+    """GeoCLIP model weights.
+
+    .. versionadded:: 0.10
+    """
+
+    GEOCLIP_GPS_GALLERY = Weights(
+        url='https://github.com/VicenteVivan/geo-clip/raw/refs/heads/7a1a23b49648a5872a771cfda28490a17ab17d15/geoclip/model/gps_gallery/coordinates_100K.csv',
+        transforms=nn.Identity(),
+        meta={
+            'dataset': 'MP-16',
+            'publication': 'https://arxiv.org/abs/2309.16020',
+            'repo': 'https://github.com/VicenteVivan/geo-clip',
+        },
+    )
+
+    GEOCLIP_IMAGE_ENCODER_MLP = Weights(
+        url='https://github.com/VicenteVivan/geo-clip/raw/refs/heads/7a1a23b49648a5872a771cfda28490a17ab17d15/geoclip/model/weights/image_encoder_mlp_weights.pth',
+        transforms=transforms.Compose(
+            [
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.PILToTensor(),
+                transforms.ConvertImageDtype(torch.float),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ]
+        ),
+        meta={
+            'dataset': 'MP-16',
+            'publication': 'https://arxiv.org/abs/2309.16020',
+            'repo': 'https://github.com/VicenteVivan/geo-clip',
+        },
+    )
+
+    GEOCLIP_LOCATION_ENCODER = Weights(
+        url='https://github.com/VicenteVivan/geo-clip/raw/refs/heads/7a1a23b49648a5872a771cfda28490a17ab17d15/geoclip/model/weights/location_encoder_weights.pth',
+        transforms=nn.Identity(),
+        meta={
+            'dataset': 'MP-16',
+            'publication': 'https://arxiv.org/abs/2309.16020',
+            'repo': 'https://github.com/VicenteVivan/geo-clip',
+        },
+    )
+
+    GEOCLIP_LOGIT_SCALE = Weights(
+        url='https://github.com/VicenteVivan/geo-clip/raw/refs/heads/7a1a23b49648a5872a771cfda28490a17ab17d15/geoclip/model/weights/logit_scale_weights.pth',
+        transforms=nn.Identity(),
+        meta={
+            'dataset': 'MP-16',
+            'publication': 'https://arxiv.org/abs/2309.16020',
+            'repo': 'https://github.com/VicenteVivan/geo-clip',
+        },
+    )
+
+
+def geoclip(weights: bool = False, *args: int, **kwargs: int) -> GeoCLIP:
+    """GeoCLIP model.
+
+    If you use this model in your research, please cite the following paper:
+
+    * https://arxiv.org/abs/2309.16020
+
+    .. versionadded:: 0.10
+
+    Args:
+        weights: True for pre-trained model weights, else False.
+        *args: Additional arguments to pass to :class:`GeoCLIP`.
+        **kwargs: Additional keyword arguments to pass to :class:`GeoCLIP`.
+
+    Returns:
+        A Tessera model or encoder backbone.
+    """
+    model = GeoCLIP(*args, **kwargs)
+
+    if weights:
+        model.image_encoder.mlp.load_state_dict(
+            GeoCLIP_Weights.GEOCLIP_IMAGE_ENCODER_MLP.get_state_dict(progress=True),
+            strict=True,
+        )
+        model.image_encoder.CLIP = CLIPModel.from_pretrained(
+            'openai/clip-vit-large-patch14'
+        )
+        model.image_encoder.image_processor = AutoProcessor.from_pretrained(
+            'openai/clip-vit-large-patch14'
+        )
+        model.location_encoder.load_state_dict(
+            GeoCLIP_Weights.GEOCLIP_LOCATION_ENCODER.get_state_dict(progress=True),
+            strict=True,
+        )
+        model.logit_scale.load_state_dict(
+            GeoCLIP_Weights.GEOCLIP_LOGIT_SCALE.get_state_dict(progress=True),
+            strict=True,
+        )
+        model.gps_gallery = load_gps_data(GeoCLIP_Weights.GPS_GALLERY.url)
+
+    return model
