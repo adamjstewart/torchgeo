@@ -55,12 +55,12 @@ class GeoSampler(Sampler[GeoSlice], ABC):
         Returns:
             The sampler length.
         """
-        if hasattr(self, 'length'):
-            # If length is known, use it
-            return self.length
-        else:
-            # Otherwise, use brute force
-            return sum(1 for _ in self)
+        if not hasattr(self, 'length'):
+            # Use brute force to calculate length if not already cached
+            self.length = sum(1 for _ in self)
+
+        return self.length
+
 
 
 class SpatialSampler(GeoSampler):
