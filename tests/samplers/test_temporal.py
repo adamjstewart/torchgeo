@@ -25,7 +25,7 @@ class TestRandomTimestampSampler:
         return RandomTimestampSampler(dataset)
 
     def test_iter(self, sampler: RandomTimestampSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert TMIN <= t.start < t.stop <= TMAX
             assert t.stop - t.start == Timedelta('1D')
 
@@ -48,7 +48,7 @@ class TestSequentialTimestampSampler:
         return SequentialTimestampSampler(dataset)
 
     def test_iter(self, sampler: SequentialTimestampSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert TMIN <= t.start < t.stop <= TMAX
             assert t.stop - t.start == Timedelta('1D')
 
@@ -72,7 +72,7 @@ class TestRandomTimedeltaSampler:
         return RandomTimedeltaSampler(dataset, delta=delta)
 
     def test_iter(self, sampler: RandomTimedeltaSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert TMIN <= t.start < t.stop <= TMAX
             assert t.stop - t.start == Timedelta('1W')
 
@@ -96,7 +96,7 @@ class TestSequentialTimedeltaSampler:
         return SequentialTimedeltaSampler(dataset, delta=delta)
 
     def test_iter(self, sampler: SequentialTimedeltaSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert TMIN <= t.start < t.stop < TMAX + sampler.delta
             assert t.stop - t.start == Timedelta('1W')
 
@@ -119,7 +119,7 @@ class TestRandomPeriodSampler:
         return RandomPeriodSampler(dataset, freq='M', length=1)
 
     def test_iter(self, sampler: RandomPeriodSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert Period(t.start, freq='M') == Period('2025-4')
             assert Period(t.stop, freq='M') == Period('2025-4')
 
@@ -142,7 +142,7 @@ class TestSequentialPeriodSampler:
         return SequentialPeriodSampler(dataset, freq='M')
 
     def test_iter(self, sampler: SequentialPeriodSampler) -> None:
-        for _, _, t in iter(sampler):
+        for _, _, t in sampler:
             assert Period(t.start, freq='M') == Period('2025-4')
             assert Period(t.stop, freq='M') == Period('2025-4')
 
