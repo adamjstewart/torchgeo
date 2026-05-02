@@ -120,11 +120,14 @@ class SpatialSampler(GeoSampler):
         """
         geometry = self.geometry
         assert isinstance(geometry, Polygon | MultiPolygon)
+        xmin, ymin, xmax, ymax = geometry.bounds
 
         fig, ax = plt.subplots()
         ax.set_title(self.__class__.__name__)
         ax.set_xlabel('x')
         ax.set_ylabel('y')
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymin, ymax)
         ax.axis('equal')
 
         def init_func() -> Iterable[Artist]:
@@ -218,9 +221,13 @@ class TemporalSampler(GeoSampler):
         Returns:
             An animation visualizing the sampling strategy.
         """
+        left = self.index.index.left.min()
+        right = self.index.index.right.max()
+
         fig, ax = plt.subplots()
         ax.set_title(self.__class__.__name__)
         ax.set_xlabel('t')
+        ax.set_xlim(left, right)
         ax.yaxis.set_visible(False)
         ax.spines[['left', 'top', 'right']].set_visible(False)
         fig.autofmt_xdate()
