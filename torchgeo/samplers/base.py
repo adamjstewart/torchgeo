@@ -12,7 +12,8 @@ import numpy as np
 import shapely.plotting
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
-from matplotlib.patches import PathPatch, Rectangle
+from matplotlib.artist import Artist
+from matplotlib.patches import Rectangle
 from pandas import Interval, IntervalIndex
 from shapely import MultiPolygon, Polygon
 from torch.utils.data import Sampler
@@ -124,14 +125,15 @@ class SpatialSampler(GeoSampler):
         ax.set_title(self.__class__.__name__)
         ax.set_xlabel('x')
         ax.set_ylabel('y')
+        ax.axis('equal')
 
-        def init_func() -> Iterable[PathPatch]:
+        def init_func() -> Iterable[Artist]:
             """Plot the static dataset."""
-            return [shapely.plotting.plot_polygon(geometry, ax=ax)[0]]
+            return shapely.plotting.plot_polygon(geometry, ax=ax)
 
-        def func(bounds: tuple[slice, slice]) -> Iterable[Rectangle]:
+        def func(index: tuple[slice, slice]) -> Iterable[Rectangle]:
             """Plot the dynamic samples."""
-            x, y = bounds
+            x, y = index
             xy = (x.start, y.start)
             width = x.stop - x.start
             height = y.stop - y.start
@@ -139,9 +141,7 @@ class SpatialSampler(GeoSampler):
             ax.add_patch(patch)
             return [patch]
 
-        ani = FuncAnimation(fig, func=func, frames=self, init_func=init_func)
-
-        return ani
+        return FuncAnimation(fig, func=func, frames=self, init_func=init_func)
 
 
 class TemporalSampler(GeoSampler):
@@ -211,6 +211,37 @@ class TemporalSampler(GeoSampler):
         Yields:
             [:, :, tmin:tmax] coordinates to index a dataset.
         """
+
+    def plot(self) -> FuncAnimation:
+        """Plot a visualization of the sampling strategy.
+
+        Returns:
+            An animation visualizing the sampling strategy.
+        """
+        fig, ax = plt.subplots()
+        ax.set_title(self.__class__.__name__)
+        ax.set_xlabel('t')
+        ax.yaxis.set_visible(False)
+        ax.spines[['left', 'top', 'right']].set_visible(False)
+
+        def init_func() -> Iterable[Artist]:
+            """Plot the static dataset."""
+            patches = []
+            for interval in self.index.index:
+                patch = ax.axvspan(
+                    interval.left, interval.right, color='tab:blue', alpha=0.3
+                )
+                patches.append(patch)
+            return patches
+
+        def func(index: tuple[slice, slice, slice]) -> Iterable[Rectangle]:
+            """Plot the dynamic samples."""
+            _, _, t = index
+            patch = ax.axvspan(t.start, t.stop, color='tab:orange', alpha=0.3)
+            ax.add_patch(patch)
+            return [patch]
+
+        return FuncAnimation(fig, func=func, frames=self, init_func=init_func)
 
 
 class SpatioTemporalSampler(GeoSampler):
