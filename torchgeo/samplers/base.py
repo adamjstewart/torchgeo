@@ -5,12 +5,16 @@
 
 import abc
 from abc import ABC
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from typing import Literal
 
 import numpy as np
+import shapely.plotting
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib.patches import PathPatch, Rectangle
 from pandas import Interval, IntervalIndex
-from shapely import Polygon
+from shapely import MultiPolygon, Polygon
 from torch.utils.data import Sampler
 
 from ..datasets import GeoDataset
@@ -103,6 +107,41 @@ class SpatialSampler(GeoSampler):
             A single spatial and temporal sampler.
         """
         return SpatioTemporalSampler(self, other)
+
+    def plot(self) -> FuncAnimation:
+        """Plot a visualization of the sampling strategy.
+
+        Returns:
+            An animation visualizing the sampling strategy.
+
+        Raises:
+            AssertionError: If *self.geometry* is not a Polygon.
+        """
+        geometry = self.geometry
+        assert isinstance(geometry, Polygon | MultiPolygon)
+
+        fig, ax = plt.subplots()
+        ax.set_title(self.__class__.__name__)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+
+        def init_func() -> Iterable[PathPatch]:
+            """Plot the static dataset."""
+            return [shapely.plotting.plot_polygon(geometry, ax=ax)[0]]
+
+        def func(bounds: tuple[slice, slice]) -> Iterable[Rectangle]:
+            """Plot the dynamic samples."""
+            x, y = bounds
+            xy = (x.start, y.start)
+            width = x.stop - x.start
+            height = y.stop - y.start
+            patch = Rectangle(xy, width, height, color='tab:orange', alpha=0.3)
+            ax.add_patch(patch)
+            return [patch]
+
+        ani = FuncAnimation(fig, func=func, frames=self, init_func=init_func)
+
+        return ani
 
 
 class TemporalSampler(GeoSampler):

@@ -85,7 +85,7 @@ class RandomSpatialSampler(SpatialSampler):
         # Purposefully conservative radius calculation
         # TODO: this operation removes Point and LineString, should we keep these?
         distance = math.sqrt((self.size[0] / 2) ** 2 + (self.size[1] / 2) ** 2)
-        self.geometry = shapely.buffer(self.geometry, -distance)
+        self.series = GeoSeries([shapely.buffer(self.geometry, -distance)])
 
     def __iter__(self) -> Iterator[tuple[slice, slice]]:
         """Iterate over generated sample locations for each epoch.
@@ -94,8 +94,7 @@ class RandomSpatialSampler(SpatialSampler):
             [xmin:xmax, ymin:ymax] coordinates to index a dataset.
         """
         # Ensure a new set of random points for each epoch
-        series = GeoSeries([self.geometry])
-        points = series.sample_points(size=self.length, rng=self.generator)
+        points = self.series.sample_points(size=self.length, rng=self.generator)
 
         # Points are random, but order is not
         # Remove once https://github.com/geopandas/geopandas/pull/3773 is in min version
