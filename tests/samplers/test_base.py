@@ -140,6 +140,11 @@ class TestTemporalSampler:
         _, _, t = next(iter(sampler))
         assert TMIN <= t.start < t.stop <= TMAX
 
+    def test_plot(self, sampler: CustomTemporalSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
+
     def test_toi(self, dataset: GeoDataset) -> None:
         tmin = Timestamp(2025, 4, 10)
         tmax = Timestamp(2025, 4, 20)

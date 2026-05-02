@@ -1,7 +1,10 @@
 # Copyright (c) TorchGeo Contributors. All rights reserved.
 # Licensed under the MIT License.
 
+from pathlib import Path
+
 import pytest
+from matplotlib import pyplot as plt
 from pandas import Period, Timedelta, Timestamp
 from torch.utils.data import DataLoader
 
@@ -32,6 +35,11 @@ class TestRandomTimestampSampler:
     def test_len(self, sampler: RandomTimestampSampler) -> None:
         assert len(sampler) == 3
 
+    def test_plot(self, sampler: RandomTimestampSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
+
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
@@ -54,6 +62,11 @@ class TestSequentialTimestampSampler:
 
     def test_len(self, sampler: SequentialTimestampSampler) -> None:
         assert len(sampler) == 3
+
+    def test_plot(self, sampler: SequentialTimestampSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
@@ -79,6 +92,11 @@ class TestRandomTimedeltaSampler:
     def test_len(self, sampler: RandomTimedeltaSampler) -> None:
         assert len(sampler) == 5
 
+    def test_plot(self, sampler: RandomTimedeltaSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
+
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
@@ -103,6 +121,11 @@ class TestSequentialTimedeltaSampler:
     def test_len(self, sampler: SequentialTimedeltaSampler) -> None:
         assert len(sampler) == 5
 
+    def test_plot(self, sampler: SequentialTimedeltaSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
+
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
@@ -126,6 +149,11 @@ class TestRandomPeriodSampler:
     def test_len(self, sampler: RandomPeriodSampler) -> None:
         assert len(sampler) == 1
 
+    def test_plot(self, sampler: RandomPeriodSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
+
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
     def test_dataloader(
@@ -148,6 +176,11 @@ class TestSequentialPeriodSampler:
 
     def test_len(self, sampler: SequentialPeriodSampler) -> None:
         assert len(sampler) == 1
+
+    def test_plot(self, sampler: SequentialPeriodSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
 
     @pytest.mark.slow
     @pytest.mark.parametrize('num_workers', [0, 1, 2])
