@@ -223,6 +223,7 @@ class TemporalSampler(GeoSampler):
         ax.set_xlabel('t')
         ax.yaxis.set_visible(False)
         ax.spines[['left', 'top', 'right']].set_visible(False)
+        fig.autofmt_xdate()
 
         def init_func() -> Iterable[Artist]:
             """Plot the static dataset."""
