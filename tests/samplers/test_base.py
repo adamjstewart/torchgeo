@@ -2,11 +2,13 @@
 # Licensed under the MIT License.
 
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 import shapely
 from _pytest.fixtures import SubRequest
 from geopandas import GeoSeries
+from matplotlib import pyplot as plt
 from pandas import Interval, Timestamp
 from torch.utils.data import DataLoader
 
@@ -93,6 +95,11 @@ class TestSpatialSampler:
         x, y = next(iter(sampler))
         assert 0 <= x.start == x.stop <= 100
         assert 0 <= y.start == y.stop <= 100
+
+    def test_plot(self, sampler: CustomSpatialSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
 
     def test_roi(self, dataset: GeoDataset) -> None:
         roi = shapely.box(0, 0, 10, 10)

@@ -2,9 +2,11 @@
 # Licensed under the MIT License.
 
 import math
+from pathlib import Path
 
 import pytest
 import shapely
+from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 
 from torchgeo.datasets import GeoDataset
@@ -25,6 +27,11 @@ class TestRandomSpatialSampler:
 
     def test_len(self, sampler: RandomSpatialSampler) -> None:
         assert len(sampler) == 100
+
+    def test_plot(self, sampler: RandomSpatialSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
 
     def test_length(self, dataset: GeoDataset) -> None:
         sampler = RandomSpatialSampler(dataset, size=5, length=99)
@@ -65,6 +72,11 @@ class TestGridSpatialSampler:
 
     def test_len(self, sampler: GridSpatialSampler) -> None:
         assert len(sampler) == 100
+
+    def test_plot(self, sampler: GridSpatialSampler, tmp_path: Path) -> None:
+        ani = sampler.plot()
+        ani.save(tmp_path / 'out.gif')
+        plt.close()
 
     def test_stride(self, dataset: GeoDataset) -> None:
         sampler = GridSpatialSampler(dataset, size=5, stride=2.5)
