@@ -7,7 +7,7 @@ losses/ @calebrob6
 models/ @isaaccorley @ashnair1
 samplers/ @adamjstewart @nilsleh
 trainers/ @robmarkcole @calebrob6
-transforms/ @isaaccorley
+transforms/ @isaaccorley @calebrob6
 
 # Policy documents, requires 2/3 approval
 /.github/* @adamjstewart @calebrob6 @isaaccorley @nilsleh @ashnair1 @robmarkcole
