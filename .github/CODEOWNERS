@@ -1,2 +1,13 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-* @adamjstewart @calebrob6 @isaaccorley @nilsleh @ashnair1
+
+# Components
+datamodules/ @ashnair1 @robmarkcole
+datasets/ @nilsleh @adamjstewart
+losses/ @calebrob6
+models/ @isaaccorley @ashnair1
+samplers/ @adamjstewart @nilsleh
+trainers/ @robmarkcole @calebrob6
+transforms/ @isaaccorley
+
+# Policy documents, requires 2/3 approval
+/.github/* @adamjstewart @calebrob6 @isaaccorley @nilsleh @ashnair1 @robmarkcole
