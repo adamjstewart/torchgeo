@@ -82,7 +82,7 @@ class LTAE(nn.Module):
 
         assert self.n_neurons[0] == self.d_model
 
-        activation = nn.ReLU(inplace=True)
+        activation = nn.ReLU()
 
         layers = []
         for i in range(len(self.n_neurons) - 1):
@@ -95,7 +95,7 @@ class LTAE(nn.Module):
             )
 
         self.mlp = nn.Sequential(*layers)
-        self.dropout = nn.Dropout(dropout, inplace=True)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: Tensor) -> Tensor:
         """Forward pass of the model.
@@ -157,6 +157,6 @@ class PositionalEncoding(nn.Module):
             Output tensor with positional encoding added
         """
         # Get positional encoding up to the sequence length
-        pe = self.pe[:, : x.size(1)]  # type: ignore[index]
+        pe = self.pe[:, : x.size(1)]  # ty: ignore[not-subscriptable]
         output: Tensor = self.dropout(x + pe)
         return output

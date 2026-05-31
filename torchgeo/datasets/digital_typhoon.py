@@ -18,7 +18,7 @@ from torch import Tensor
 
 from .errors import DatasetNotFoundError
 from .geo import NonGeoDataset
-from .utils import Path, Sample, download_url, lazy_import, percentile_normalization
+from .utils import Path, Sample, download_url, lazy_import, quantile_normalization
 
 
 class _SampleSequenceDict(TypedDict):
@@ -239,7 +239,7 @@ class DigitalTyphoon(NonGeoDataset):
 
         self.sample_sequences: list[_SampleSequenceDict] = [
             item
-            for sublist in self.aux_df.groupby('id')[['seq_id', 'id']]  # type: ignore[no-matching-overload]
+            for sublist in self.aux_df.groupby('id')[['seq_id', 'id']]
             .apply(_get_subsequences, k=self.sequence_length)
             .tolist()
             for item in sublist
@@ -349,15 +349,15 @@ class DigitalTyphoon(NonGeoDataset):
         """
         feature_df = pd.read_csv(filepath)
         feature_df = feature_df[feature_df['file_1'] == image_path]
-        feature_dict = {
-            name: torch.tensor(feature_df[name].item()).float()
-            for name in self.features
-        }
+        feature_dict = {}
+        for name in self.features:
+            feature_dict[name] = torch.tensor(feature_df[name].item()).float()
+
         # normalize the targets for regression
         if self.task == 'regression':
             for feature, mean in self.target_mean.items():
-                feature_dict[feature] = (
-                    feature_dict[feature] - mean
+                feature_dict[str(feature)] = (
+                    feature_dict[str(feature)] - mean
                 ) / self.target_std[feature]
         return feature_dict
 
@@ -425,9 +425,9 @@ class DigitalTyphoon(NonGeoDataset):
         Returns:
             a matplotlib Figure with the rendered sample
         """
-        image, label = sample['image'].numpy(), sample['label'].numpy()
+        image, label = sample['image'], sample['label']
 
-        image = percentile_normalization(image)
+        image = quantile_normalization(image)
         image = einops.rearrange(image, 'c h w -> h w c')
 
         showing_predictions = 'prediction' in sample
