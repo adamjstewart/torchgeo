@@ -10,11 +10,14 @@ from .classification import ClassificationTask, MultiLabelClassificationTask
 from .detection import ObjectDetectionTask
 from .instance_segmentation import InstanceSegmentationTask
 from .iobench import IOBenchTask
-from .mixins import ClassificationMixin
+from .mae import MAETask
+from .mixins import ClassificationMixin, RegressionMixin
 from .moco import MoCoTask
 from .regression import PixelwiseRegressionTask, RegressionTask
 from .segmentation import SemanticSegmentationTask
 from .simclr import SimCLRTask
+from .spatiotemporal_segmentation import SpatioTemporalSegmentationTask
+from .temporal_regression import TemporalRegressionTask
 
 __all__ = (
     'BYOLTask',
@@ -24,11 +27,15 @@ __all__ = (
     'ClassificationTask',
     'IOBenchTask',
     'InstanceSegmentationTask',
+    'MAETask',
     'MoCoTask',
     'MultiLabelClassificationTask',
     'ObjectDetectionTask',
     'PixelwiseRegressionTask',
+    'RegressionMixin',
     'RegressionTask',
     'SemanticSegmentationTask',
     'SimCLRTask',
+    'SpatioTemporalSegmentationTask',
+    'TemporalRegressionTask',
 )
