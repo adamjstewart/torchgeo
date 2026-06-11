@@ -252,7 +252,7 @@ class MillionAID(NonGeoDataset):
         image = self._load_image(files['image'])
         cls_label = [self.class_to_idx[label] for label in files['label']]
         label = torch.tensor(cls_label, dtype=torch.long)
-        sample = {'image': image, 'label': label}
+        sample: Sample = {'image': image, 'label': label}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

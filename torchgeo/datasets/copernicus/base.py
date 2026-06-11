@@ -18,7 +18,6 @@ from einops import rearrange
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from pyproj import Transformer
-from torch import Tensor
 
 from torchgeo.datasets.geo import NonGeoDataset
 
@@ -131,7 +130,7 @@ class CopernicusBenchBase(NonGeoDataset, ABC):
         """
         return len(self.files)
 
-    def _load_image(self, path: str) -> dict[str, Tensor]:
+    def _load_image(self, path: str) -> Sample:
         """Load an image and metadata.
 
         Args:
@@ -172,7 +171,7 @@ class CopernicusBenchBase(NonGeoDataset, ABC):
 
         return sample
 
-    def _load_mask(self, path: str) -> dict[str, Tensor]:
+    def _load_mask(self, path: str) -> Sample:
         """Load a target mask.
 
         Args:

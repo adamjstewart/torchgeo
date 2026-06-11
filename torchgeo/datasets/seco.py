@@ -134,7 +134,7 @@ class SeasonalContrastS2(NonGeoDataset):
 
         images = [self._load_patch(root, subdir) for subdir in subdirs]
 
-        sample = {'image': torch.cat(images)}
+        sample: Sample = {'image': torch.cat(images)}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

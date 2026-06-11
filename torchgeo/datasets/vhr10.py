@@ -168,7 +168,7 @@ class VHR10(NonGeoDataset):
         Returns:
             data and label at that index
         """
-        sample = {}
+        sample: Sample = {}
 
         # Both 'positive' and 'negative' splits have an image
         split = f'{self.split} image set'

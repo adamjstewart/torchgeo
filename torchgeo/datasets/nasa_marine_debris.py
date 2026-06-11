@@ -104,7 +104,7 @@ class NASAMarineDebris(NonGeoDataset):
         indices = w_check & h_check
         boxes = boxes[indices]
 
-        sample = {'image': image, 'bbox_xyxy': boxes}
+        sample: Sample = {'image': image, 'bbox_xyxy': boxes}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

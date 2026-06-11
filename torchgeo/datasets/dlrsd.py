@@ -21,6 +21,7 @@ from .errors import DatasetNotFoundError
 from .geo import NonGeoDataset
 from .utils import (
     Path,
+    Sample,
     check_integrity,
     download_url,
     draw_semantic_segmentation_masks,
@@ -98,7 +99,7 @@ class DLRSDBase(NonGeoDataset):
     def __init__(
         self,
         root: Path = 'data',
-        transforms: Callable[[dict[str, Tensor]], dict[str, Tensor]] | None = None,
+        transforms: Callable[[Sample], Sample] | None = None,
         download: bool = False,
         checksum: bool = False,
     ) -> None:
@@ -219,7 +220,7 @@ class DLRSD(DLRSDBase):
     def __init__(
         self,
         root: Path = 'data',
-        transforms: Callable[[dict[str, Tensor]], dict[str, Tensor]] | None = None,
+        transforms: Callable[[Sample], Sample] | None = None,
         download: bool = False,
         checksum: bool = False,
     ) -> None:
@@ -251,7 +252,7 @@ class DLRSD(DLRSDBase):
             for p in self.image_fns
         ]
 
-    def __getitem__(self, index: int) -> dict[str, Tensor]:
+    def __getitem__(self, index: int) -> Sample:
         """Return an index within the dataset.
 
         Args:
@@ -262,7 +263,7 @@ class DLRSD(DLRSDBase):
         """
         image = self._load_image(index)
         mask = self._load_mask(index)
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -287,7 +288,7 @@ class DLRSD(DLRSDBase):
 
     def plot(
         self,
-        sample: dict[str, Tensor],
+        sample: Sample,
         show_titles: bool = True,
         suptitle: str | None = None,
         alpha: float = 0.5,
@@ -371,7 +372,7 @@ class DLRSDMultilabel(DLRSDBase):
     def __init__(
         self,
         root: Path = 'data',
-        transforms: Callable[[dict[str, Tensor]], dict[str, Tensor]] | None = None,
+        transforms: Callable[[Sample], Sample] | None = None,
         download: bool = False,
         checksum: bool = False,
     ) -> None:
@@ -400,7 +401,7 @@ class DLRSDMultilabel(DLRSDBase):
         for _, row in df.iterrows():
             self.multilabels[row.iloc[0]] = [int(x) for x in row.iloc[1:]]
 
-    def __getitem__(self, index: int) -> dict[str, Tensor]:
+    def __getitem__(self, index: int) -> Sample:
         """Return an index within the dataset.
 
         Args:
@@ -411,7 +412,7 @@ class DLRSDMultilabel(DLRSDBase):
         """
         image = self._load_image(index)
         label = self._load_target(index)
-        sample = {'image': image, 'label': label}
+        sample: Sample = {'image': image, 'label': label}
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -445,10 +446,7 @@ class DLRSDMultilabel(DLRSDBase):
         return [self.classes[i] for i, v in enumerate(label_mask) if v]
 
     def plot(
-        self,
-        sample: dict[str, Tensor],
-        show_titles: bool = True,
-        suptitle: str | None = None,
+        self, sample: Sample, show_titles: bool = True, suptitle: str | None = None
     ) -> Figure:
         """Plot a sample from the dataset.
 

@@ -17,7 +17,7 @@ from torch.nn.modules import Module
 from torchvision.models._api import WeightsEnum
 
 from torchgeo.datamodules import MisconfigurationException, OSCDDataModule
-from torchgeo.datasets import OSCD, RGBBandsMissingError
+from torchgeo.datasets import OSCD, RGBBandsMissingError, Sample
 from torchgeo.main import main
 from torchgeo.models import ResNet18_Weights
 from torchgeo.trainers import ChangeDetectionTask
@@ -282,7 +282,7 @@ class TestChangeDetectionTask:
     def test_changevit_predict(self) -> None:
         """Test ChangeViT predict_step to ensure input is not rearranged."""
         model = ChangeDetectionTask(model='changevit', backbone='vit_tiny_patch16_224')
-        batch = {'image': torch.randn(1, 2, 3, 256, 256)}
+        batch: Sample = {'image': torch.randn(1, 2, 3, 256, 256)}
         y = model.predict_step(batch, batch_idx=0)
         assert y.shape == (1, 1, 256, 256)
 

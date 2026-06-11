@@ -147,7 +147,7 @@ class USAVars(NonGeoDataset):
         tif_file = self.files[index]
         id_ = tif_file[5:-4]
 
-        sample = {
+        sample: Sample = {
             'labels': Tensor(
                 [self.label_dfs[lab].loc[id_][lab] for lab in self.labels]
             ),

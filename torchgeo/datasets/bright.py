@@ -141,7 +141,7 @@ class BRIGHTDFC2025(NonGeoDataset):
         # post image is stacked to also have 3 channels
         image_post = repeat(image_post, 'c h w -> (repeat c) h w', repeat=3)
 
-        sample = {'image': torch.stack([image_pre, image_post])}
+        sample: Sample = {'image': torch.stack([image_pre, image_post])}
 
         if 'target' in idx_paths and self.split != 'test':
             target = self._load_image(idx_paths['target']).long()

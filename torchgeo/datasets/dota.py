@@ -245,7 +245,7 @@ class DOTA(NonGeoDataset):
         """
         sample_row = self.sample_df.iloc[index]
 
-        sample = {'image': self._load_image(sample_row['image_path'])}
+        sample: Sample = {'image': self._load_image(sample_row['image_path'])}
 
         boxes, labels = self._load_annotations(sample_row['annotation_path'])
 

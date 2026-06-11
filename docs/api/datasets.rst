@@ -154,6 +154,11 @@ Splitting Functions
 .. autofunction:: roi_split
 .. autofunction:: time_series_split
 
+Type Hints
+^^^^^^^^^^
+
+.. autoclass:: Sample
+
 Errors
 ------
 

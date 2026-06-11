@@ -175,7 +175,7 @@ class EuroSAT(NonGeoClassificationDataset):
         image, label = self._load_image(index)
 
         image = torch.index_select(image, dim=0, index=self.band_indices).float()
-        sample = {'image': image, 'label': label}
+        sample: Sample = {'image': image, 'label': label}
 
         if self.tg_transforms is not None:
             sample = self.tg_transforms(sample)

@@ -153,7 +153,7 @@ class HySpecNet11k(NonGeoDataset):
         with rio.open(os.path.join(self.root, 'hyspecnet-11k', 'patches', path)) as src:
             minx, maxx = src.bounds.left, src.bounds.right
             miny, maxy = src.bounds.bottom, src.bounds.top
-            sample = {
+            sample: Sample = {
                 'image': torch.tensor(src.read(self.band_indices).astype('float32')),
                 'x': torch.tensor((minx + maxx) / 2),
                 'y': torch.tensor((miny + maxy) / 2),

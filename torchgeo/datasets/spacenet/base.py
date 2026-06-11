@@ -236,7 +236,7 @@ class SpaceNet(NonGeoDataset, ABC):
         image_path = self.images[index]
         img, tfm, raster_crs = self._load_image(image_path)
         h, w = img.shape[1:]
-        sample = {'image': img}
+        sample: Sample = {'image': img}
 
         if self.split == 'train':
             mask_path = self.masks[index]

@@ -187,7 +187,7 @@ class DFC2022(NonGeoDataset):
         dem = self._load_image(files['dem'], shape=image.shape[1:])
         image = torch.cat(tensors=[image, dem], dim=0)
 
-        sample = {'image': image}
+        sample: Sample = {'image': image}
 
         if self.split == 'train':
             mask = self._load_target(files['target'])

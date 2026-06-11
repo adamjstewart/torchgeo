@@ -131,10 +131,10 @@ class CopernicusPretrain(IterableDataset[Sample]):
         Returns:
             The same sample with only Tensor images.
         """
-        new_sample = {}
+        new_sample: Sample = {}
         for key, value in sample.items():
             if isinstance(value, Tensor):
-                new_sample[key] = value
+                new_sample[key] = value  # ty: ignore[invalid-assignment]
 
         return new_sample
 
@@ -185,7 +185,7 @@ class CopernicusPretrain(IterableDataset[Sample]):
         for key in sample:
             if key.endswith('.pth') and key != 'dem.pth':
                 idx = random.randint(0, sample[key].shape[0] - 1)
-                sample[key] = sample[key][idx]
+                sample[key] = sample[key][idx]  # ty: ignore[invalid-assignment]
 
         return sample
 

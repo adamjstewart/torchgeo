@@ -7,6 +7,7 @@ from typing import Any
 
 import kornia.augmentation as K
 import torch
+from torch import Tensor
 from torch.utils.data import random_split
 
 from ..datasets import TreeSatAI
@@ -129,11 +130,11 @@ class TreeSatAIDataModule(NonGeoDataModule):
         """
         batch = super().on_after_batch_transfer(batch, dataloader_idx)
 
-        images = []
+        images: list[Tensor] = []
         for sensor in self.sensors:
             aug = K.Normalize(mean=means[sensor], std=stds[sensor], keepdim=True)
             batch[f'image_{sensor}'] = aug(batch[f'image_{sensor}'])
-            images.append(batch[f'image_{sensor}'])
+            images.append(batch[f'image_{sensor}'])  # ty: ignore[invalid-argument-type]
 
         batch['image'] = torch.cat(images, dim=1)
 

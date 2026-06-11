@@ -73,7 +73,7 @@ class ClayEmbeddings(NonGeoDataset):
         centroid = shapely.centroid(row['geometry'])
         key = 'embedding' if 'embedding' in row else 'embeddings'
 
-        sample = {
+        sample: Sample = {
             'embedding': torch.tensor(row[key]),
             'x': torch.tensor(centroid.x),
             'y': torch.tensor(centroid.y),

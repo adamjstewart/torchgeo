@@ -117,7 +117,7 @@ class CloudCoverDetection(NonGeoDataset):
         chip_id = str(self.metadata.iat[index, 0])
         image = self._load_image(chip_id)
         label = self._load_target(chip_id)
-        sample = {'image': image, 'mask': label}
+        sample: Sample = {'image': image, 'mask': label}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

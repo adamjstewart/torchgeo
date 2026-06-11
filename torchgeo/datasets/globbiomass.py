@@ -224,7 +224,7 @@ class GlobBiomass(RasterDataset):
         mask = torch.cat((mask, std_err_mask), dim=-3)
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample = {
+        sample: Sample = {
             'mask': mask,
             'bounds': self._slice_to_tensor(index),
             'transform': torch.tensor(transform),

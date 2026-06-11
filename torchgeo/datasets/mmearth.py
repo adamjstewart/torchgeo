@@ -459,7 +459,7 @@ class MMEarth(NonGeoDataset):
 
                 tensor = self._preprocess_modality(data, modality, tile_info, bands)
                 modality_name = self.modality_category_name.get(modality, '') + modality
-                sample[modality_name] = tensor
+                sample[modality_name] = tensor  # ty: ignore[invalid-assignment]
 
             # add additional metadata to the sample
             sample['lat'] = torch.tensor(tile_info['lat'])
@@ -684,7 +684,7 @@ class MMEarth(NonGeoDataset):
             modalities_name = key.split('_', 1)[1]
             match modalities_name:
                 case 'sentinel2':
-                    norm_img = quantile_normalization(val[[3, 2, 1]])
+                    norm_img = quantile_normalization(val[[3, 2, 1]])  # ty: ignore[invalid-argument-type]
                     images.append(rearrange(norm_img, 'c h w -> h w c'))
 
                     titles.append('Sentinel-2 RGB')
@@ -711,7 +711,7 @@ class MMEarth(NonGeoDataset):
                     images.append(rgb_image)
                     titles.append(modalities_name.replace('_', ' ').title())
                 case _:
-                    band_val = val[0]
+                    band_val: Tensor = val[0]  # ty: ignore[invalid-assignment]
                     norm_img = quantile_normalization(band_val)
                     images.append(norm_img)
 

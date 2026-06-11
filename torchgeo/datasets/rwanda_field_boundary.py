@@ -120,7 +120,7 @@ class RwandaFieldBoundary(NonGeoDataset):
                 with rasterio.open(os.path.join(path, f'{index:02}_{band}.tif')) as src:
                     patches.append(src.read(1).astype(np.float32))
             images.append(patches)
-        sample = {'image': torch.from_numpy(np.array(images))}
+        sample: Sample = {'image': torch.from_numpy(np.array(images))}
 
         if self.split == 'train':
             path = os.path.join(self.root, 'labels', self.split)

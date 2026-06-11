@@ -37,7 +37,7 @@ from rasterio import Affine
 from shapely import Geometry
 from torch import Tensor
 from torchvision.utils import draw_segmentation_masks
-from typing_extensions import deprecated
+from typing_extensions import TypedDict, deprecated
 
 from .errors import DependencyNotFoundError
 
@@ -61,18 +61,30 @@ GeoSlice: TypeAlias = (  # noqa: UP040
 #: and some can support a list of paths.
 Path: TypeAlias = str | os.PathLike[str]  # noqa: UP040
 
-#: Sample dictionary returned by a GeoDataset.
-#:
-#: Keys typically follow Kornia constants and include common keys like:
-#:
-#: * image: input image
-#: * mask: expected output semantic segmentation mask
-#: * label: expected output classification or regression label
-#: * bbox_xyxy: expected output bounding box in (x1, y1, x2, y2) format
-#: * prediction: predicted output
-#:
-#: Values are usually of type torch.Tensor.
-Sample: TypeAlias = dict[str, Any]  # noqa: UP040
+
+class Sample(TypedDict, total=False, extra_items=Tensor):
+    """Sample dictionary returned by all datasets."""
+
+    #: Input image
+    image: Tensor
+
+    #: Expected output semantic segmentation mask
+    mask: Tensor
+
+    #: Expected output bounding box in (x1, y1, x2, y2) format
+    bbox_xyxy: Tensor  # list[Tensor]
+
+    #: Keypoints in (x, y) format
+    keypoints: Tensor
+
+    #: Expected output classification or regression label
+    label: Tensor
+
+    #: Predicted output
+    prediction: Tensor
+
+    #: Image caption
+    caption: str
 
 
 @deprecated('Use torchgeo.datasets.utils.GeoSlice or shapely.Polygon instead')
@@ -570,7 +582,7 @@ def _dict_list_to_list_dict(sample: Mapping[str, Sequence[Any]]) -> list[Sample]
 
     .. versionadded:: 0.2
     """
-    uncollated = [{} for _ in range(max(map(len, sample.values())))]
+    uncollated: list[Sample] = [{} for _ in range(max(map(len, sample.values())))]
     for key, values in sample.items():
         for i, value in enumerate(values):
             uncollated[i][key] = value
@@ -592,7 +604,7 @@ def pad_across_batches(
 
     .. versionadded:: 0.8
     """
-    collated = {}
+    collated: Sample = {}
     images = [sample['image'] for sample in batch]
     feature_shape = images[0].shape[1:]
 
@@ -647,12 +659,12 @@ def stack_samples(samples: Iterable[Sample]) -> Sample:
     .. versionadded:: 0.2
     """
     uncollated = _list_dict_to_dict_list(samples)
-    collated = {}
+    collated: Sample = {}
     for key, value in uncollated.items():
         if isinstance(value[0], Tensor):
-            collated[key] = torch.stack(value)
+            collated[key] = torch.stack(value)  # ty: ignore[invalid-assignment]
         else:
-            collated[key] = value
+            collated[key] = value  # ty: ignore[invalid-assignment]
     return collated
 
 
@@ -670,10 +682,10 @@ def concat_samples(samples: Iterable[Sample]) -> Sample:
     .. versionadded:: 0.2
     """
     uncollated = _list_dict_to_dict_list(samples)
-    collated = {}
+    collated: Sample = {}
     for key, value in uncollated.items():
         if isinstance(value[0], Tensor):
-            collated[key] = torch.cat(value)
+            collated[key] = torch.cat(value)  # ty: ignore[invalid-assignment]
         else:
             collated[key] = value[0]
     return collated
@@ -692,15 +704,15 @@ def merge_samples(samples: Iterable[Sample]) -> Sample:
 
     .. versionadded:: 0.2
     """
-    collated = {}
+    collated: Sample = {}
     for sample in samples:
         for key, value in sample.items():
             if key in collated and isinstance(value, Tensor):
                 # Take the maximum so that nodata values (zeros) get replaced
                 # by data values whenever possible
-                collated[key] = torch.maximum(collated[key], value)
+                collated[key] = torch.maximum(collated[key], value)  # ty: ignore[invalid-assignment,invalid-argument-type]
             else:
-                collated[key] = value
+                collated[key] = value  # ty: ignore[invalid-assignment]
     return collated
 
 

@@ -137,7 +137,7 @@ class InstanceSegmentationTask(BaseTask):
             The loss tensor.
         """
         x = batch['image']
-        y = {
+        y: Sample = {
             'boxes': batch['bbox_xyxy'],
             'labels': batch['label'],
             'masks': batch['mask'],
@@ -158,7 +158,7 @@ class InstanceSegmentationTask(BaseTask):
             dataloader_idx: Index of the current dataloader.
         """
         x = batch['image']
-        y = {
+        y: Sample = {
             'boxes': batch['bbox_xyxy'],
             'labels': batch['label'],
             'masks': batch['mask'],
@@ -220,7 +220,7 @@ class InstanceSegmentationTask(BaseTask):
             dataloader_idx: Index of the current dataloader.
         """
         x = batch['image']
-        y = {
+        y: Sample = {
             'boxes': batch['bbox_xyxy'],
             'labels': batch['label'],
             'masks': batch['mask'],

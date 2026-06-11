@@ -115,7 +115,12 @@ class ReforesTree(NonGeoDataset):
 
         boxes, labels, agb = self._load_target(filepath)
 
-        sample = {'image': image, 'bbox_xyxy': boxes, 'label': labels, 'agb': agb}
+        sample: Sample = {
+            'image': image,
+            'bbox_xyxy': boxes,
+            'label': labels,
+            'agb': agb,
+        }
 
         if self.transforms is not None:
             sample = self.transforms(sample)

@@ -138,7 +138,7 @@ class ETCI2021(NonGeoDataset):
             mask = water_mask.unsqueeze(0)
 
         image = torch.cat(tensors=[vv, vh], dim=0)
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

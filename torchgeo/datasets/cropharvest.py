@@ -143,7 +143,7 @@ class CropHarvest(NonGeoDataset):
         data = self._load_array(files['chip'])
 
         label = self._load_label(files['index'], files['dataset'])
-        sample = {'array': data, 'label': label}
+        sample: Sample = {'array': data, 'label': label}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

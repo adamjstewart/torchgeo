@@ -245,9 +245,9 @@ class MDAS(NonGeoDataset):
         sample: Sample = {}
         for modality, path in sample_files.items():
             if 'osm' in modality:
-                sample[f'{modality}_mask'] = self._load_image(path).long()
+                sample[f'{modality}_mask'] = self._load_image(path).long()  # ty: ignore[invalid-assignment]
             else:
-                sample[f'{modality}_image'] = self._load_image(path)
+                sample[f'{modality}_image'] = self._load_image(path)  # ty: ignore[invalid-assignment]
 
         if self.transforms:
             sample = self.transforms(sample)
@@ -325,13 +325,13 @@ class MDAS(NonGeoDataset):
                     axs[idx].imshow(img, cmap='gray')
                 case 'EeteS_EnMAP_10m_image' | 'EeteS_EnMAP_30m_image':
                     img = (
-                        data[self.enmap_rgb_band_idx].numpy().transpose(1, 2, 0)
+                        data[self.enmap_rgb_band_idx].numpy().transpose(1, 2, 0)  # ty: ignore[invalid-argument-type]
                         / 10000.0
                     )
                     axs[idx].imshow(img)
                 case 'EeteS_Sentinel_2_10m_image':
                     img = (
-                        data[self.sentinel_2_rgb_band_idx].numpy().transpose(1, 2, 0)
+                        data[self.sentinel_2_rgb_band_idx].numpy().transpose(1, 2, 0)  # ty: ignore[invalid-argument-type]
                         / 10000.0
                     )
                     axs[idx].imshow(img)
@@ -340,13 +340,13 @@ class MDAS(NonGeoDataset):
                     axs[idx].imshow(img)
                 case 'Sentinel_2_image':
                     img = (
-                        data[self.sentinel_2_rgb_band_idx].numpy().transpose(1, 2, 0)
+                        data[self.sentinel_2_rgb_band_idx].numpy().transpose(1, 2, 0)  # ty: ignore[invalid-argument-type]
                         / 10000.0
                     )
                     axs[idx].imshow(img)
                 case 'HySpex_image':
                     img = (
-                        data[self.hyspex_rgb_band_idx].numpy().transpose(1, 2, 0)
+                        data[self.hyspex_rgb_band_idx].numpy().transpose(1, 2, 0)  # ty: ignore[invalid-argument-type]
                         / 15000.0
                     )
                     axs[idx].imshow(img)

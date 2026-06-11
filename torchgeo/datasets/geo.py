@@ -1354,7 +1354,7 @@ class NonGeoClassificationDataset(NonGeoDataset, ImageFolder):
             data and label at that index
         """
         image, label = self._load_image(index)
-        sample = {'image': image, 'label': label}
+        sample: Sample = {'image': image, 'label': label}
 
         if self.tg_transforms is not None:
             sample = self.tg_transforms(sample)
@@ -1622,7 +1622,7 @@ class UnionDataset(GeoDataset):
         dataset2.crs = dataset1.crs
         dataset2.res = dataset1.res
 
-        self.index = pd.concat([dataset1.index, dataset2.index])  # ty: ignore[invalid-assignment]
+        self.index = pd.concat([dataset1.index, dataset2.index])
 
     def __getitem__(self, index: GeoSlice) -> Sample:
         """Retrieve input, target, and/or metadata indexed by spatiotemporal slice.

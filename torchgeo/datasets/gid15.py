@@ -138,9 +138,9 @@ class GID15(NonGeoDataset):
 
         if self.split != 'test':
             mask = self._load_target(files['mask'])
-            sample = {'image': image, 'mask': mask}
+            sample: Sample = {'image': image, 'mask': mask}
         else:
-            sample = {'image': image}
+            sample: Sample = {'image': image}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

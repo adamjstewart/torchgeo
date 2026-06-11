@@ -644,7 +644,7 @@ class SatlasPretrain(NonGeoDataset):
         idx = torch.randint(len(good_directories), (1,))
         directory = good_directories[idx]
         time = self.image_times[directory].timestamp()
-        sample[f'time_{image}'] = torch.tensor(time)
+        sample[f'time_{image}'] = torch.tensor(time)  # ty: ignore[invalid-assignment]
 
         # Load all bands
         resample = Image.Resampling.BILINEAR
@@ -656,7 +656,7 @@ class SatlasPretrain(NonGeoDataset):
                 array = np.atleast_3d(np.array(img, dtype=np.float32))
                 channels.append(torch.tensor(array))
         raster = rearrange(torch.cat(channels, dim=-1), 'h w c -> c h w')
-        sample[f'image_{image}'] = raster
+        sample[f'image_{image}'] = raster  # ty: ignore[invalid-assignment]
 
     def _load_label(self, sample: Sample, label: str, col: int, row: int) -> None:
         """Load a single label.
@@ -673,7 +673,7 @@ class SatlasPretrain(NonGeoDataset):
                 raster = torch.tensor(np.array(img, dtype=np.int64))
         else:
             raster = torch.zeros(self.chip_size, self.chip_size, dtype=torch.long)
-        sample[f'mask_{label}'] = raster
+        sample[f'mask_{label}'] = raster  # ty: ignore[invalid-assignment]
 
     def _verify(self) -> None:
         """Verify the integrity of the dataset."""
@@ -724,20 +724,20 @@ class SatlasPretrain(NonGeoDataset):
         for key, value in sample.items():
             match key.split('_', 1):
                 case ['image', 'landsat']:
-                    images.append(rearrange(value[[3, 2, 1]], 'c h w -> h w c') / 255)
+                    images.append(rearrange(value[[3, 2, 1]], 'c h w -> h w c') / 255)  # ty: ignore[invalid-argument-type]
                     titles.append('Landsat 8/9')
                 case ['image', 'naip']:
-                    images.append(rearrange(value[:3], 'c h w -> h w c') / 255)
+                    images.append(rearrange(value[:3], 'c h w -> h w c') / 255)  # ty: ignore[unsupported-operator]
                     titles.append('NAIP')
                 case ['image', 'sentinel1']:
-                    images.extend([value[0] / 255, value[1] / 255])
+                    images.extend([value[0] / 255, value[1] / 255])  # ty: ignore[unsupported-operator]
                     titles.extend(['Sentinel-1 VH', 'Sentinel-1 VV'])
                 case ['image', 'sentinel2']:
-                    images.append(rearrange(value[:3], 'c h w -> h w c') / 255)
+                    images.append(rearrange(value[:3], 'c h w -> h w c') / 255)  # ty: ignore[unsupported-operator]
                     titles.append('Sentinel-2')
                 case ['mask' | 'prediction', label]:
                     cmap = torch.tensor(TASKS[label]['colors'])
-                    images.append(cmap[value])
+                    images.append(cmap[value])  # ty: ignore[invalid-argument-type]
                     titles.append(label.replace('_', ' ').capitalize())
 
         fig, ax = plt.subplots(ncols=len(images), squeeze=False)

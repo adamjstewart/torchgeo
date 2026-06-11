@@ -186,7 +186,7 @@ class FieldsOfTheWorld(NonGeoDataset):
         mask = self._load_target(mask_fn)
 
         image = torch.cat((win_b, win_a), dim=0)
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

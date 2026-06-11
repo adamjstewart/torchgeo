@@ -177,7 +177,7 @@ class InriaAerialImageLabeling(NonGeoDataset):
         """
         files = self.files[index]
         img = self._load_image(files['image'])
-        sample = {'image': img}
+        sample: Sample = {'image': img}
         if files.get('label'):
             mask = self._load_target(files['label'])
             sample['mask'] = mask

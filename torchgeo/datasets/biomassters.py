@@ -155,7 +155,7 @@ class BioMassters(NonGeoDataset):
         sample: Sample = {}
         for sens in self.sensors:
             sens_filepaths = [fp for fp in filepaths if sens in fp]
-            sample[f'image_{sens}'] = self._load_input(sens_filepaths)
+            sample[f'image_{sens}'] = self._load_input(sens_filepaths)  # ty: ignore[invalid-assignment]
 
         if self.split == 'train':
             sample['label'] = self._load_target(

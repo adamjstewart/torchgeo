@@ -231,10 +231,15 @@ class PASTIS(NonGeoDataset):
         image = self._load_image(index)
         if self.mode == 'semantic':
             mask = self._load_semantic_targets(index)
-            sample = {'image': image, 'mask': mask}
+            sample: Sample = {'image': image, 'mask': mask}
         elif self.mode == 'instance':
             mask, boxes, labels = self._load_instance_targets(index)
-            sample = {'image': image, 'mask': mask, 'bbox_xyxy': boxes, 'label': labels}
+            sample: Sample = {
+                'image': image,
+                'mask': mask,
+                'bbox_xyxy': boxes,
+                'label': labels,
+            }
 
         if self.transforms is not None:
             sample = self.transforms(sample)

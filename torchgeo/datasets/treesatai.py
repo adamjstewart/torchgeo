@@ -189,10 +189,10 @@ class TreeSatAI(NonGeoDataset):
             i = self.classes.index(genus)
             label[i] = 1
 
-        sample = {'label': label}
+        sample: Sample = {'label': label}
         for directory in self.sensors:
             with rio.open(os.path.join(self.root, directory, '60m', file)) as f:
-                sample[f'image_{directory}'] = torch.tensor(f.read().astype('float32'))
+                sample[f'image_{directory}'] = torch.tensor(f.read().astype('float32'))  # ty: ignore[invalid-assignment]
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -252,7 +252,7 @@ class TreeSatAI(NonGeoDataset):
         fig, ax = plt.subplots(ncols=len(self.sensors), squeeze=False)
 
         for i, sensor in enumerate(self.sensors):
-            image = sample[f'image_{sensor}']
+            image: Tensor = sample[f'image_{sensor}']  # ty: ignore[invalid-assignment]
             bands = [self.all_bands[sensor].index(b) for b in self.rgb_bands[sensor]]
             image = rearrange(image[bands], 'c h w -> h w c')
             image = quantile_normalization(image)

@@ -97,7 +97,7 @@ class S2100k(NonGeoDataset):
         row = self.index.iloc[index]
 
         point = torch.tensor([row['lon'], row['lat']])
-        sample = {'point': point}
+        sample: Sample = {'point': point}
 
         if self.mode == 'both':
             with rio.open(self.root / 'images' / row['fn']) as f:

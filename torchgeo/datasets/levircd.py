@@ -84,7 +84,7 @@ class LEVIRCDBase(NonGeoDataset, abc.ABC):
         image1 = self._load_image(files['image1'])
         image2 = self._load_image(files['image2'])
         mask = self._load_target(files['mask'])
-        sample = {'image': torch.stack([image1, image2]), 'mask': mask}
+        sample: Sample = {'image': torch.stack([image1, image2]), 'mask': mask}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

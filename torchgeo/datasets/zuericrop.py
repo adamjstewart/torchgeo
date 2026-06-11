@@ -109,7 +109,12 @@ class ZueriCrop(NonGeoDataset):
         image = self._load_image(index)
         mask, boxes, label = self._load_target(index)
 
-        sample = {'image': image, 'mask': mask, 'bbox_xyxy': boxes, 'label': label}
+        sample: Sample = {
+            'image': image,
+            'mask': mask,
+            'bbox_xyxy': boxes,
+            'label': label,
+        }
 
         if self.transforms is not None:
             sample = self.transforms(sample)

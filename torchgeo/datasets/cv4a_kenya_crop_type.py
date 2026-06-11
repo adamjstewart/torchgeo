@@ -170,7 +170,7 @@ class CV4AKenyaCropType(NonGeoDataset):
         labels = labels[y : y + self.chip_size, x : x + self.chip_size]
         field_ids = field_ids[y : y + self.chip_size, x : x + self.chip_size]
 
-        sample = {
+        sample: Sample = {
             'image': img,
             'mask': labels,
             'field_ids': field_ids,

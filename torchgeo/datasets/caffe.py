@@ -175,7 +175,11 @@ class CaFFe(NonGeoDataset):
         zone_mask = self.ordinal_map_zones[zone_mask]
         front_mask = self.ordinal_map_fronts[front_mask]
 
-        sample = {'image': img, 'mask_front': front_mask, 'mask_zones': zone_mask}
+        sample: Sample = {
+            'image': img,
+            'mask_front': front_mask,
+            'mask_zones': zone_mask,
+        }
 
         if self.transforms:
             sample = self.transforms(sample)

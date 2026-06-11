@@ -215,7 +215,7 @@ class IDTReeS(NonGeoDataset):
         hsi = self._load_image(path.replace('RGB', 'HSI'))
         chm = self._load_image(path.replace('RGB', 'CHM'))
         las = self._load_las(path.replace('RGB', 'LAS').replace('.tif', '.las'))
-        sample = {'image': image, 'hsi': hsi, 'chm': chm, 'las': las}
+        sample: Sample = {'image': image, 'hsi': hsi, 'chm': chm, 'las': las}
 
         if self.split == 'test':
             if self.task == 'task2':

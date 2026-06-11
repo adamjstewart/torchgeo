@@ -149,7 +149,7 @@ class OSCD(NonGeoDataset):
         image2 = self._load_image(files['images2'])
         mask = self._load_target(str(files['mask']))
         image = torch.stack(tensors=[image1, image2], dim=0)
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
 
         if self.transforms is not None:
             # FIXME: VideoSequential only works with a batch dimension

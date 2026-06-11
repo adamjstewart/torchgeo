@@ -96,7 +96,7 @@ class TropicalCyclone(NonGeoDataset):
         Returns:
             data, labels, field ids, and metadata at that index
         """
-        sample = {
+        sample: Sample = {
             'relative_time': torch.tensor(self.features.iat[index, 2]),
             'ocean': torch.tensor(self.features.iat[index, 3]),
             'label': torch.tensor(self.labels.iat[index, 1]),

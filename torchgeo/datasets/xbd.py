@@ -128,7 +128,7 @@ class xBD(NonGeoDataset):
         # Clamp to avoid potential negative numbers
         mask = torch.clamp(mask2 - mask1, 0, 4)
 
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

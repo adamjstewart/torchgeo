@@ -246,7 +246,7 @@ class WesternUSALiveFuelMoisture(NonGeoDataset):
         """
         data = self.dataframe.iloc[index, :]
 
-        sample = {
+        sample: Sample = {
             'input': torch.tensor(
                 data.drop([self.label_name]).values, dtype=torch.float32
             ),

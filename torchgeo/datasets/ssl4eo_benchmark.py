@@ -268,7 +268,7 @@ class SSL4EOLBenchmark(NonGeoDataset):
         """
         img_path, mask_path = self.sample_collection[index]
 
-        sample = {
+        sample: Sample = {
             'image': self._load_image(img_path),
             'mask': self._load_mask(mask_path),
         }

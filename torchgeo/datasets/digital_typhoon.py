@@ -260,7 +260,7 @@ class DigitalTyphoon(NonGeoDataset):
             & (self.aux_df['seq_id'].isin(sample_entry['seq_id']))
         ]
 
-        sample = {'image': self._load_image(sample_df)}
+        sample: Sample = {'image': self._load_image(sample_df)}
         # load features of the last image in the sequence
         sample.update(
             self._load_features(
@@ -337,7 +337,7 @@ class DigitalTyphoon(NonGeoDataset):
         ).float()
         return tensor
 
-    def _load_features(self, filepath: str, image_path: str) -> dict[str, Tensor]:
+    def _load_features(self, filepath: str, image_path: str) -> Sample:
         """Load features for the corresponding image.
 
         Args:
@@ -359,7 +359,7 @@ class DigitalTyphoon(NonGeoDataset):
                 feature_dict[str(feature)] = (
                     feature_dict[str(feature)] - mean
                 ) / self.target_std[feature]
-        return feature_dict
+        return feature_dict  # ty: ignore[invalid-return-type]
 
     def _verify(self) -> None:
         """Verify the integrity of the dataset."""

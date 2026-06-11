@@ -136,7 +136,7 @@ class ADVANCE(NonGeoDataset):
         audio = self._load_target(files['audio'])
         cls_label = self.class_to_idx[files['cls']]
         label = torch.tensor(cls_label, dtype=torch.long)
-        sample = {'image': image, 'audio': audio, 'label': label}
+        sample: Sample = {'image': image, 'audio': audio, 'label': label}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

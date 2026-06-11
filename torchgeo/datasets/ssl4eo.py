@@ -276,7 +276,7 @@ class SSL4EOL(SSL4EO):
                 ts.append((mint.timestamp() + maxt.timestamp()) / 2)
                 wavelengths.extend(self.wavelengths)
 
-        sample = {
+        sample: Sample = {
             'image': torch.cat(images),
             'x': torch.tensor(xs),
             'y': torch.tensor(ys),
@@ -613,7 +613,7 @@ class SSL4EOS12(SSL4EO):
                 ys.append((miny + maxy) / 2)
                 ts.append((mint.timestamp() + maxt.timestamp()) / 2)
 
-        sample = {
+        sample: Sample = {
             'image': torch.cat(images),
             'x': torch.tensor(xs),
             'y': torch.tensor(ys),

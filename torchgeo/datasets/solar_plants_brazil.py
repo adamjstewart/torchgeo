@@ -126,7 +126,7 @@ class SolarPlantsBrazil(NonGeoDataset):
         """
         image = self._load_image(self.image_paths[index])
         mask = self._load_mask(self.mask_paths[index])
-        sample = {'image': image, 'mask': mask}
+        sample: Sample = {'image': image, 'mask': mask}
         if self.transforms:
             sample = self.transforms(sample)
         return sample
@@ -166,9 +166,7 @@ class SolarPlantsBrazil(NonGeoDataset):
         bin_mask = (arr > 0).astype(np.uint8)
         return torch.from_numpy(bin_mask).long()
 
-    def plot(
-        self, sample: dict[str, torch.Tensor], suptitle: str | None = None
-    ) -> Figure:
+    def plot(self, sample: Sample, suptitle: str | None = None) -> Figure:
         """Plot a sample from the SolarPlantsBrazil dataset.
 
         Args:

@@ -72,7 +72,7 @@ class MajorTOMEmbeddings(NonGeoDataset):
         row = self.data.iloc[index]
         t = pd.Timestamp(row['timestamp'])
 
-        sample = {
+        sample: Sample = {
             'embedding': torch.tensor(row['embedding']),
             'x': torch.tensor(row['centre_lon']),
             'y': torch.tensor(row['centre_lat']),

@@ -20,6 +20,7 @@ from shapely.geometry.base import BaseGeometry
 
 from torchgeo.datasets import DatasetNotFoundError, OpenStreetMap
 from torchgeo.datasets.openstreetmap import OSMClassConfig
+from torchgeo.datasets.utils import Sample
 
 
 class TestOpenStreetMap:
@@ -170,7 +171,7 @@ class TestOpenStreetMap:
             paths=common_test_params['root'],
             classes=common_test_params['classes'],
         )
-        sample = {'mask': torch.zeros((10, 10))}  # Typical sample format
+        sample: Sample = {'mask': torch.zeros((10, 10))}  # Typical sample format
         fig = dataset.plot(sample, **plot_kwargs)
 
         assert fig is not None
@@ -839,7 +840,7 @@ class TestOpenStreetMap:
             download=False,
         )
 
-        sample = {'mask': torch.zeros((10, 10))}  # Typical sample format
+        sample: Sample = {'mask': torch.zeros((10, 10))}  # Typical sample format
         fig = dataset.plot(sample)
         assert fig is not None
         plt.close()

@@ -41,6 +41,6 @@ class TestSkyScript:
 
     def test_plot(self, dataset: SkyScript) -> None:
         x = dataset[0]
-        x['prediction'] = x['caption']
+        x['prediction'] = x['caption']  # ty: ignore[invalid-assignment]
         dataset.plot(x, suptitle='Test')
         plt.close()

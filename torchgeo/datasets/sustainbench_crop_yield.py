@@ -123,7 +123,7 @@ class SustainBenchCropYield(NonGeoDataset):
                 year = year_npz_file[idx]
                 ndvi = ndvi_npz_file[idx]
 
-                features = {
+                features: Sample = {
                     'label': torch.tensor(target).to(torch.float32),
                     'year': torch.tensor(int(year)),
                     'ndvi': torch.from_numpy(ndvi).to(dtype=torch.float32),

@@ -497,7 +497,7 @@ class TestCollateFunctionsDifferingKeys:
     def samples(self) -> list[Sample]:
         return [
             {'image': torch.tensor([1, 2, 0])},
-            {'mask': torch.tensor([0, 0, 3]), 'other': 5},
+            {'mask': torch.tensor([0, 0, 3]), 'caption': 'invalid'},
         ]
 
     def test_stack_unbind_samples(self, samples: list[Sample]) -> None:
@@ -597,7 +597,7 @@ def test_which() -> None:
 
 
 def test_pad_across_batches() -> None:
-    batch = [
+    batch: list[Sample] = [
         {'image': torch.ones(2, 10, 5, 5), 'mask': torch.zeros(5, 5)},
         {'image': torch.ones(3, 10, 5, 5), 'mask': torch.zeros(5, 5)},
     ]
@@ -614,7 +614,7 @@ def test_pad_across_batches() -> None:
     assert out['mask'].shape[0] == len(batch)
     assert torch.equal(out['length'], torch.tensor([1, 1], device=out['length'].device))
 
-    batch = [
+    batch: list[Sample] = [
         {
             'image': torch.ones(3, 5, 5),
             'bbox_xyxy': torch.ones(2, 4),

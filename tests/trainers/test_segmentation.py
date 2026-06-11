@@ -17,7 +17,7 @@ from torch.nn.modules import Module
 from torchvision.models._api import WeightsEnum
 
 from torchgeo.datamodules import MisconfigurationException, SEN12MSDataModule
-from torchgeo.datasets import RGBBandsMissingError
+from torchgeo.datasets import RGBBandsMissingError, Sample
 from torchgeo.main import main
 from torchgeo.models import ResNet18_Weights
 from torchgeo.trainers import SemanticSegmentationTask
@@ -299,7 +299,7 @@ class TestSemanticSegmentationTask:
     def test_predict_step_returns_dict(self) -> None:
         """Test that predict_step returns a dictionary."""
         task = SemanticSegmentationTask(task='multiclass', num_classes=10)
-        batch = {'image': torch.randn(2, 3, 64, 64)}
+        batch: Sample = {'image': torch.randn(2, 3, 64, 64)}
         result = task.predict_step(batch, 0)
 
         assert isinstance(result, dict)
@@ -307,7 +307,7 @@ class TestSemanticSegmentationTask:
     def test_predict_step_contains_required_keys(self) -> None:
         """Test that predict_step dict contains required keys."""
         task = SemanticSegmentationTask(task='multiclass', num_classes=10)
-        batch = {'image': torch.randn(2, 3, 64, 64)}
+        batch: Sample = {'image': torch.randn(2, 3, 64, 64)}
         result = task.predict_step(batch, 0)
 
         assert 'probabilities' in result
@@ -320,7 +320,7 @@ class TestSemanticSegmentationTask:
         task = SemanticSegmentationTask(task='multiclass', num_classes=num_classes)
         batch_size = 2
         height, width = 64, 64
-        batch = {'image': torch.randn(batch_size, 3, height, width)}
+        batch: Sample = {'image': torch.randn(batch_size, 3, height, width)}
         result = task.predict_step(batch, 0)
 
         probabilities = result['probabilities']
@@ -332,7 +332,7 @@ class TestSemanticSegmentationTask:
         task = SemanticSegmentationTask(task='multiclass', num_classes=10)
         bounds_tensor = torch.randn(2, 9)
         transform_tensor = torch.randn(2, 6)
-        batch = {
+        batch: Sample = {
             'image': torch.randn(2, 3, 64, 64),
             'bounds': bounds_tensor,
             'transform': transform_tensor,

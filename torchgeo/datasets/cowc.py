@@ -119,7 +119,10 @@ class COWC(NonGeoDataset, abc.ABC):
         Returns:
             data and label at that index
         """
-        sample = {'image': self._load_image(index), 'label': self._load_target(index)}
+        sample: Sample = {
+            'image': self._load_image(index),
+            'label': self._load_target(index),
+        }
 
         if self.transforms is not None:
             sample = self.transforms(sample)

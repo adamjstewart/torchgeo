@@ -152,7 +152,7 @@ class ForestDamage(NonGeoDataset):
 
         boxes, labels = self._load_target(parsed['bboxes'], parsed['labels'])
 
-        sample = {'image': image, 'bbox_xyxy': boxes, 'label': labels}
+        sample: Sample = {'image': image, 'bbox_xyxy': boxes, 'label': labels}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

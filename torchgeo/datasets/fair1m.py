@@ -276,14 +276,14 @@ class FAIR1M(NonGeoDataset):
         path = self.files[index]
 
         image = self._load_image(path)
-        sample = {'image': image}
+        sample: Sample = {'image': image}
 
         if self.split != 'test':
             label_path = str(path).replace(self.image_root, self.label_root)
             label_path = label_path.replace('.tif', '.xml')
             voc = parse_pascal_voc(label_path)
             boxes, labels = self._load_target(voc['points'], voc['labels'])
-            sample = {'image': image, 'bbox_xyxy': boxes, 'label': labels}
+            sample: Sample = {'image': image, 'bbox_xyxy': boxes, 'label': labels}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

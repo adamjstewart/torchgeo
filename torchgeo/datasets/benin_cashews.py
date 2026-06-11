@@ -225,7 +225,7 @@ class BeninSmallHolderCashews(NonGeoDataset):
         img = img[:, :, y : y + self.chip_size, x : x + self.chip_size]
         labels = labels[y : y + self.chip_size, x : x + self.chip_size]
 
-        sample = {
+        sample: Sample = {
             'image': img,
             'mask': labels,
             'x': torch.tensor(x),

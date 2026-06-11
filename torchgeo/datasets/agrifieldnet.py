@@ -239,7 +239,7 @@ class AgriFieldNet(RasterDataset):
         mask = self.ordinal_map[mask.squeeze().long()]
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample = {
+        sample: Sample = {
             'bounds': self._slice_to_tensor(index),
             'image': image.float(),
             'mask': mask.long(),

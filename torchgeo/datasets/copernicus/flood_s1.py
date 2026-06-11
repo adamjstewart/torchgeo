@@ -16,7 +16,6 @@ import rasterio as rio
 import torch
 from matplotlib.colors import ListedColormap
 from pyproj import Transformer
-from torch import Tensor
 
 from ..utils import Path, Sample, disambiguate_timestamp
 from .base import CopernicusBenchBase
@@ -108,7 +107,7 @@ class CopernicusBenchFloodS1(CopernicusBenchBase):
 
         return sample
 
-    def _load_image(self, path: str) -> dict[str, Tensor]:
+    def _load_image(self, path: str) -> Sample:
         """Load an image and metadata.
 
         Args:

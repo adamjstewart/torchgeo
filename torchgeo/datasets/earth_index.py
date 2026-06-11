@@ -70,7 +70,7 @@ class EarthIndexEmbeddings(NonGeoDataset):
         """
         row = self.data.iloc[index]
 
-        sample = {
+        sample: Sample = {
             'embedding': torch.tensor(row['embedding']),
             'x': torch.tensor(row['geometry'].x),
             'y': torch.tensor(row['geometry'].y),

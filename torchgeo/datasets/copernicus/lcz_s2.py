@@ -127,7 +127,7 @@ class CopernicusBenchLCZS2(CopernicusBenchBase):
             sen2 = rearrange(sen2, 'h w c -> c h w')
             label = f['label'][index].argmax()
 
-        sample = {'image': torch.from_numpy(sen2), 'label': torch.tensor(label)}
+        sample: Sample = {'image': torch.from_numpy(sen2), 'label': torch.tensor(label)}
 
         if self.transforms is not None:
             sample = self.transforms(sample)

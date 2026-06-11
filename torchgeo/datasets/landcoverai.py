@@ -268,7 +268,7 @@ class LandCoverAIGeo(LandCoverAIBase, RasterDataset):
         img = self._merge_or_stack(img_filepaths, index, self.band_indexes)
         mask = self._merge_or_stack(mask_filepaths, index, self.band_indexes)
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample = {
+        sample: Sample = {
             'bounds': self._slice_to_tensor(index),
             'image': img.float(),
             'mask': mask.long(),
@@ -343,7 +343,10 @@ class LandCoverAI(LandCoverAIBase, NonGeoDataset):
             data and label at that index
         """
         id_ = self.ids[index].rstrip()
-        sample = {'image': self._load_image(id_), 'mask': self._load_target(id_)}
+        sample: Sample = {
+            'image': self._load_image(id_),
+            'mask': self._load_target(id_),
+        }
 
         if self.transforms is not None:
             sample = self.transforms(sample)

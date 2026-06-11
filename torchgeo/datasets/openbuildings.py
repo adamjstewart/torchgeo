@@ -311,7 +311,7 @@ class OpenBuildings(VectorDataset):
             masks = torch.zeros(size=(1, round(height), round(width)))
 
         transform = rasterio.transform.from_origin(x.start, y.stop, x.step, y.step)
-        sample = {
+        sample: Sample = {
             'mask': masks,
             'bounds': self._slice_to_tensor(index),
             'transform': torch.tensor(transform),
