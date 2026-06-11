@@ -3883,7 +3883,7 @@ requires-dist = [
     { name = "types-geopandas", marker = "extra == 'style'", specifier = ">=1.0" },
     { name = "types-requests", marker = "extra == 'style'", specifier = ">=2.25" },
     { name = "types-shapely", marker = "extra == 'style'", specifier = ">=2.0.2" },
-    { name = "typing-extensions", specifier = ">=4.10" },
+    { name = "typing-extensions", specifier = ">=4.13" },
     { name = "webdataset", marker = "extra == 'datasets'", specifier = ">=0.2.4" },
     { name = "xarray", marker = "extra == 'datasets'", specifier = ">=0.17" },
 ]
