@@ -288,6 +288,8 @@ class SpatioTemporalSampler(GeoSampler):
         self.temporal_sampler = temporal_sampler
 
         match self.spatial_sampler.strategy, self.temporal_sampler.strategy:
+            case 'random', 'random':
+                self._length = len(self.spatial_sampler)
             case 'random', 'sequential':
                 msg = 'random_sampler @ sequential_sampler may result in a different '
                 msg += 'number of samples per epoch if different random locations have '
