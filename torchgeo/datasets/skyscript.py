@@ -4,6 +4,7 @@
 """SkyScript dataset."""
 
 import pathlib
+import textwrap
 from collections.abc import Callable
 from typing import ClassVar, Literal
 
@@ -194,11 +195,11 @@ class SkyScript(NonGeoDataset):
 
         if show_titles:
             caption = sample['caption'].numpy()
-            title = self.tokenizer.decode(caption)
+            title = textwrap.wrap(self.tokenizer.decode(caption))
             if 'prediction' in sample:
                 caption = sample['prediction'].numpy()
-                title += '\n' + self.tokenizer.decode(caption)
-            ax.set_title(title)
+                title += textwrap.wrap(self.tokenizer.decode(caption))
+            ax.set_title('\n'.join(title))
 
         if suptitle is not None:
             plt.suptitle(suptitle)

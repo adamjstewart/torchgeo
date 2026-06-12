@@ -13,6 +13,8 @@ from torch import Tensor
 
 from torchgeo.datasets import DatasetNotFoundError, SkyScript
 
+pytest.importorskip('tokenizers', minversion='0.14')
+
 
 class TestSkyScript:
     @pytest.fixture
