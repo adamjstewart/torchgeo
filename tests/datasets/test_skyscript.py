@@ -26,7 +26,7 @@ class TestSkyScript:
         x = dataset[0]
         assert isinstance(x, dict)
         assert isinstance(x['image'], Tensor)
-        assert isinstance(x['caption'], str)
+        assert isinstance(x['caption'], Tensor)
 
     def test_len(self, dataset: SkyScript) -> None:
         assert len(dataset) == 2

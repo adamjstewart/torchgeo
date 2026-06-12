@@ -3,9 +3,9 @@
 
 """SkyScript dataset."""
 
-import os
+import pathlib
 from collections.abc import Callable
-from typing import ClassVar, Literal, NotRequired, TypedDict
+from typing import ClassVar, Literal
 
 import numpy as np
 import pandas as pd
@@ -14,19 +14,17 @@ from einops import rearrange
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from PIL import Image
-from torch import Tensor
 
 from .errors import DatasetNotFoundError
 from .geo import NonGeoDataset
-from .utils import Path, download_and_extract_archive, download_url, extract_archive
-
-
-class CaptionSample(TypedDict):
-    """Sample for image captioning."""
-
-    image: Tensor
-    caption: str
-    prediction: NotRequired[str]
+from .utils import (
+    Path,
+    Sample,
+    download_and_extract_archive,
+    download_url,
+    extract_archive,
+    lazy_import,
+)
 
 
 class SkyScript(NonGeoDataset):
@@ -40,6 +38,11 @@ class SkyScript(NonGeoDataset):
     If you use this dataset in your research, please cite it using the following format:
 
     * https://arxiv.org/abs/2312.12856
+
+    .. note::
+       This dataset requires the following additional library to be installed:
+
+       * `tokenizers <https://pypi.org/project/tokenizers/>`_ to tokenize the captions
 
     .. versionadded:: 0.6
     """
@@ -72,7 +75,7 @@ class SkyScript(NonGeoDataset):
         self,
         root: Path = 'data',
         split: Literal['train', 'val', 'test'] = 'train',
-        transforms: Callable[[CaptionSample], CaptionSample] | None = None,
+        transforms: Callable[[Sample], Sample] | None = None,
         download: bool = False,
         checksum: bool = False,
     ) -> None:
@@ -89,10 +92,12 @@ class SkyScript(NonGeoDataset):
         Raises:
             AssertionError: If *split* is invalid.
             DatasetNotFoundError: If dataset is not found and *download* is False.
+            DependencyNotFoundError: If tokenizers is not installed.
         """
         assert split in self.caption_files
+        tokenizers = lazy_import('tokenizers')
 
-        self.root = root
+        self.root = pathlib.Path(root)
         self.split = split
         self.transforms = transforms
         self.download = download
@@ -100,7 +105,12 @@ class SkyScript(NonGeoDataset):
 
         self._verify()
 
-        self.captions = pd.read_csv(os.path.join(self.root, self.caption_files[split]))
+        self.captions = pd.read_csv(self.root / self.caption_files[split])
+        train_captions = pd.read_csv(self.root / self.caption_files['train'])
+
+        self.tokenizer = tokenizers.Tokenizer(tokenizers.models.BPE())
+        trainer = tokenizers.trainers.BpeTrainer()
+        self.tokenizer.train_from_iterator(train_captions['title'], trainer)
 
     def __len__(self) -> int:
         """Return the number of images in the dataset.
@@ -110,7 +120,7 @@ class SkyScript(NonGeoDataset):
         """
         return len(self.captions)
 
-    def __getitem__(self, index: int) -> CaptionSample:  # ty: ignore[invalid-method-override]
+    def __getitem__(self, index: int) -> Sample:
         """Return an index within the dataset.
 
         Args:
@@ -120,13 +130,14 @@ class SkyScript(NonGeoDataset):
             A dict containing image and caption at index.
         """
         filepath, title = self.captions.iloc[index][:2]
+        output = self.tokenizer.encode(title)
 
-        with Image.open(os.path.join(self.root, filepath)) as img:
+        with Image.open(self.root / filepath) as img:
             array = np.array(img, dtype=np.float32)
             array = rearrange(array, 'h w c -> c h w')
             image = torch.from_numpy(array)
 
-        sample: CaptionSample = {'image': image, 'caption': title}
+        sample = {'image': image, 'caption': torch.tensor(output.ids)}
 
         if self.transforms is not None:
             sample = self.transforms(sample)
@@ -138,12 +149,12 @@ class SkyScript(NonGeoDataset):
         md5: str | None
         for directory, md5 in zip(self.image_dirs, self.image_md5s):
             # Check if the extracted files already exist
-            if os.path.isdir(os.path.join(self.root, directory)):
+            if (self.root / directory).is_dir():
                 continue
 
             # Check if the zip files have already been downloaded
-            if os.path.isfile(os.path.join(self.root, f'{directory}.zip')):
-                extract_archive(os.path.join(self.root, f'{directory}.zip'))
+            if (self.root / f'{directory}.zip').is_file():
+                extract_archive(self.root / f'{directory}.zip')
                 continue
 
             # Check if the user requested to download the dataset
@@ -155,17 +166,15 @@ class SkyScript(NonGeoDataset):
             md5 = md5 if self.checksum else None
             download_and_extract_archive(url, self.root, md5=md5)
 
-        # Download the caption file
-        if self.download:
-            url = self.url.format(self.caption_files[self.split])
-            md5 = self.caption_md5s[self.split] if self.checksum else None
-            download_url(url, self.root, md5=md5)
+        # Download the caption files
+        for split in {'train', self.split}:
+            if self.download:
+                url = self.url.format(self.caption_files[split])
+                md5 = self.caption_md5s[split] if self.checksum else None
+                download_url(url, self.root, md5=md5)
 
     def plot(
-        self,
-        sample: CaptionSample,
-        show_titles: bool = True,
-        suptitle: str | None = None,
+        self, sample: Sample, show_titles: bool = True, suptitle: str | None = None
     ) -> Figure:
         """Plot a sample from the dataset.
 
@@ -184,9 +193,11 @@ class SkyScript(NonGeoDataset):
         ax.axis('off')
 
         if show_titles:
-            title = sample['caption']
+            caption = sample['caption'].numpy()
+            title = self.tokenizer.decode(caption)
             if 'prediction' in sample:
-                title += '\n' + sample['prediction']
+                caption = sample['prediction'].numpy()
+                title += '\n' + self.tokenizer.decode(caption)
             ax.set_title(title)
 
         if suptitle is not None:
