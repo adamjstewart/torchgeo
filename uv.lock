@@ -3700,7 +3700,7 @@ name = "tokenizers"
 version = "0.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "huggingface-hub" },
+    { name = "huggingface-hub", marker = "python_full_version < '3.14'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c1/60/21f715d9faba5f5407ff759472ade058ec4a507ad62bcea47cb847239a73/tokenizers-0.23.1.tar.gz", hash = "sha256:1feeeadf865a7915adc25445dea30e9933e593c31bb96c277cee36de227c8bfa", size = 365748, upload-time = "2026-04-27T14:43:25.606Z" }
 wheels = [
@@ -3817,7 +3817,7 @@ all = [
     { name = "scipy" },
     { name = "sphinx" },
     { name = "sphinx-github-changelog" },
-    { name = "tokenizers" },
+    { name = "tokenizers", marker = "python_full_version < '3.14'" },
     { name = "ty" },
     { name = "types-geopandas" },
     { name = "types-requests" },
@@ -3832,7 +3832,7 @@ datasets = [
     { name = "pandas", extra = ["parquet"] },
     { name = "rioxarray" },
     { name = "scipy" },
-    { name = "tokenizers" },
+    { name = "tokenizers", marker = "python_full_version < '3.14'" },
     { name = "webdataset" },
     { name = "xarray" },
 ]
@@ -3904,7 +3904,7 @@ requires-dist = [
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=8" },
     { name = "sphinx-github-changelog", marker = "extra == 'docs'", specifier = ">=1.7.2" },
     { name = "timm", specifier = ">=1.0.3" },
-    { name = "tokenizers", marker = "extra == 'datasets'", specifier = ">=0.14" },
+    { name = "tokenizers", marker = "python_full_version < '3.14' and extra == 'datasets'", specifier = ">=0.14" },
     { name = "torch", specifier = ">=2.2" },
     { name = "torchgeo", extras = ["datasets", "docs", "models", "style", "tests"], marker = "extra == 'all'" },
     { name = "torchmetrics", extras = ["detection"], specifier = ">=1.5" },
