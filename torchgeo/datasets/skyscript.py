@@ -6,7 +6,7 @@
 import pathlib
 import textwrap
 from collections.abc import Callable
-from typing import ClassVar, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 import numpy as np
 import pandas as pd
@@ -26,6 +26,9 @@ from .utils import (
     extract_archive,
     lazy_import,
 )
+
+if TYPE_CHECKING:
+    import tokenizers
 
 
 class SkyScript(NonGeoDataset):
@@ -79,6 +82,7 @@ class SkyScript(NonGeoDataset):
         transforms: Callable[[Sample], Sample] | None = None,
         download: bool = False,
         checksum: bool = False,
+        tokenizer: 'tokenizers.models.Model | None' = None,
     ) -> None:
         """Initialize a new SkyScript instance.
 
@@ -89,14 +93,18 @@ class SkyScript(NonGeoDataset):
                 entry and returns a transformed version.
             download: If True, download dataset and store it in the root directory.
             checksum: If True, check the MD5 of the downloaded files (may be slow).
+            tokenizer: A pre-trained tokenizer
+                (defaults to :class:`~tokenizers.models.BPE`).
 
         Raises:
             AssertionError: If *split* is invalid.
             DatasetNotFoundError: If dataset is not found and *download* is False.
             DependencyNotFoundError: If tokenizers is not installed.
+
+        .. versionadded:: 0.10
+           The *tokenizer* parameter.
         """
         assert split in self.caption_files
-        tokenizers = lazy_import('tokenizers')
 
         self.root = pathlib.Path(root)
         self.split = split
@@ -107,11 +115,15 @@ class SkyScript(NonGeoDataset):
         self._verify()
 
         self.captions = pd.read_csv(self.root / self.caption_files[split])
-        train_captions = pd.read_csv(self.root / self.caption_files['train'])
 
-        self.tokenizer = tokenizers.Tokenizer(tokenizers.models.BPE())
-        trainer = tokenizers.trainers.BpeTrainer()
-        self.tokenizer.train_from_iterator(train_captions['title'], trainer)
+        if tokenizer is None:
+            tokenizers = lazy_import('tokenizers')
+            self.tokenizer = tokenizers.Tokenizer(tokenizers.models.BPE())
+            trainer = tokenizers.trainers.BpeTrainer()
+            train_captions = pd.read_csv(self.root / self.caption_files['train'])
+            self.tokenizer.train_from_iterator(train_captions['title'], trainer)
+        else:
+            self.tokenizer = tokenizer
 
     def __len__(self) -> int:
         """Return the number of images in the dataset.
