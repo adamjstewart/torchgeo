@@ -25,7 +25,7 @@ import rasterio.merge
 import shapely
 import torch
 from geopandas import GeoDataFrame
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import ListedColormap
 from PIL.Image import Image
 from pyproj import CRS
 from rasterio.enums import Resampling
@@ -472,9 +472,7 @@ class RasterDataset(GeoDataset):
                     # See if file has a color map
                     if self.cmap is None:
                         try:
-                            name = self.__class__.__name__
-                            colors = list(vrt.colormap(1).values())
-                            self.cmap = LinearSegmentedColormap.from_list(name, colors)
+                            self.cmap = ListedColormap(vrt.colormap(1).values())
                         except ValueError:
                             pass
                     if crs is None:
