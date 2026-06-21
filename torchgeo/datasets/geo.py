@@ -472,7 +472,8 @@ class RasterDataset(GeoDataset):
                     # See if file has a color map
                     if self.cmap is None:
                         try:
-                            self.cmap = ListedColormap(vrt.colormap(1).values())
+                            colors = np.array(vrt.colormap(1).values()) / 255
+                            self.cmap = ListedColormap(colors)
                         except ValueError:
                             pass
                     if crs is None:
