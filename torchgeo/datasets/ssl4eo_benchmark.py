@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import torch
+from matplotlib.colors import Colormap
 from matplotlib.figure import Figure
 from torch import Tensor
 
@@ -104,10 +105,7 @@ class SSL4EOLBenchmark(NonGeoDataset):
 
     split_percentages = (0.7, 0.15, 0.15)
 
-    cmaps: ClassVar[dict[str, dict[int, tuple[int, int, int, int]]]] = {
-        'nlcd': NLCD.cmap,
-        'cdl': CDL.cmap,
-    }
+    cmaps: ClassVar[dict[str, Colormap]] = {'nlcd': NLCD.cmap, 'cdl': CDL.cmap}
 
     def __init__(
         self,
