@@ -205,7 +205,7 @@ class AgriFieldNet(IntersectionDataset):
         super().__init__(self.image, self.mask)
 
         # Ignore unintentional partial overlap
-        #self.index = self.image.index
+        self.index = self.image.index
 
         # Map chosen classes to ordinal numbers, all others mapped to background class
         self.ordinal_map = torch.zeros(
