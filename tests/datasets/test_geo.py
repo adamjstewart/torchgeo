@@ -548,6 +548,10 @@ class TestRasterDataset:
         ):
             RasterDataset(root)
 
+    def test_cmap(self) -> None:
+        root = os.path.join('tests', 'data', 'cdl')
+        RasterDataset(root)
+
 
 class TestXarrayDataset:
     pytest.importorskip('rioxarray', minversion='0.14.1')
