@@ -379,31 +379,33 @@ class NLCD(RasterDataset):
         / 255
     )
 
+    valid_classes = (
+        11,
+        12,
+        21,
+        22,
+        23,
+        24,
+        31,
+        41,
+        42,
+        43,
+        52,
+        71,
+        81,
+        82,
+        90,
+        95,
+        250,
+    )
+
     def __init__(
         self,
         paths: Path | Iterable[Path] = 'data',
         crs: CRS | None = None,
         res: float | tuple[float, float] | None = None,
         years: list[int] = [2024],
-        classes: list[int] = [
-            11,
-            12,
-            21,
-            22,
-            23,
-            24,
-            31,
-            41,
-            42,
-            43,
-            52,
-            71,
-            81,
-            82,
-            90,
-            95,
-            250,
-        ],
+        classes: list[int] = list(valid_classes),
         transforms: Callable[[Sample], Sample] | None = None,
         cache: bool = True,
         download: bool = False,
@@ -431,7 +433,7 @@ class NLCD(RasterDataset):
                 [T, C, H, W]. If False, merge data into a [C, H, W] mosaic.
 
         Raises:
-            AssertionError: If ``years`` is invalid
+            AssertionError: if ``years`` or ``classes`` are invalid
             DatasetNotFoundError: If dataset is not found and *download* is False.
 
         .. versionadded:: 0.9
@@ -441,13 +443,17 @@ class NLCD(RasterDataset):
             'NLCD data product only exists for the following years: '
             f'{list(self.md5s.keys())}.'
         )
+        assert set(classes) <= set(self.valid_classes), (
+            f'Only the following classes are valid: {self.valid_classes}.'
+        )
+        assert 250 in classes, 'Classes must include the background class: 250'
 
         self.paths = paths
         self.years = years
         self.classes = classes
         self.download = download
         self.checksum = checksum
-        self.ordinal_map = torch.zeros(256, dtype=self.dtype)
+        self.ordinal_map = torch.zeros(self.valid_classes[-1] + 1, dtype=self.dtype)
         self.inverse_map = torch.zeros(len(classes), dtype=self.dtype)
 
         self._verify()
