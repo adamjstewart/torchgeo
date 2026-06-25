@@ -533,7 +533,7 @@ class CDL(RasterDataset):
         self.download = download
         self.checksum = checksum
         self.ordinal_map = torch.zeros(self.valid_classes[-1] + 1, dtype=self.dtype)
-        self.inverse_map = torch.zeros(len(self.classes), dtype=self.dtype)
+        self.inverse_map = torch.zeros(len(classes), dtype=self.dtype)
 
         self._verify()
 
