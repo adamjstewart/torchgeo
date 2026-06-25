@@ -161,12 +161,13 @@ class IOBench(IntersectionDataset):
         mask = sample['mask'].squeeze()
 
         image = quantile_normalization(image)
-        mask = self.cdl.ordinal_cmap[mask]
+        mask = self.cdl.inverse_map[mask]
 
         fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+        kwargs = {'cmap': self.cdl.cmap, 'vmin': 0, 'vmax': 255, 'interpolation': 'none'}
 
         axes[0].imshow(image)
-        axes[1].imshow(mask, interpolation='none')
+        axes[1].imshow(mask, **kwargs)
 
         axes[0].axis('off')
         axes[1].axis('off')
