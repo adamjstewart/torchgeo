@@ -114,7 +114,6 @@ class NLCD(RasterDataset):
     }
 
     cmap: ClassVar[dict[int, tuple[int, int, int, int]]] = {
-        0: (0, 0, 0, 0),
         11: (70, 107, 159, 255),
         12: (209, 222, 248, 255),
         21: (222, 197, 197, 255),
@@ -131,6 +130,7 @@ class NLCD(RasterDataset):
         82: (171, 108, 40, 255),
         90: (184, 217, 235, 255),
         95: (108, 159, 184, 255),
+        250: (0, 0, 0, 0),
     }
 
     def __init__(
@@ -180,7 +180,6 @@ class NLCD(RasterDataset):
         assert set(classes) <= self.cmap.keys(), (
             f'Only the following classes are valid: {list(self.cmap.keys())}.'
         )
-        assert 0 in classes, 'Classes must include the background class: 0'
 
         self.paths = paths
         self.years = years
