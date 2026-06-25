@@ -164,7 +164,12 @@ class IOBench(IntersectionDataset):
         mask = self.cdl.inverse_map[mask]
 
         fig, axes = plt.subplots(1, 2, figsize=(8, 4))
-        kwargs = {'cmap': self.cdl.cmap, 'vmin': 0, 'vmax': 255, 'interpolation': 'none'}
+        kwargs = {
+            'cmap': self.cdl.cmap,
+            'vmin': 0,
+            'vmax': 255,
+            'interpolation': 'none',
+        }
 
         axes[0].imshow(image)
         axes[1].imshow(mask, **kwargs)
