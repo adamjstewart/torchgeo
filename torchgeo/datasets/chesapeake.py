@@ -450,16 +450,29 @@ class ChesapeakeCVPR(GeoDataset):
 
     _res = (1, 1)
 
-    lc_cmap: ClassVar[dict[int, tuple[int, int, int, int]]] = {
-        0: (0, 0, 0, 0),
-        1: (0, 197, 255, 255),
-        2: (38, 115, 0, 255),
-        3: (163, 255, 115, 255),
-        4: (255, 170, 0, 255),
-        5: (156, 156, 156, 255),
-        6: (0, 0, 0, 255),
-        15: (0, 0, 0, 0),
-    }
+    lc_cmap = ListedColormap(
+        np.array(
+            [
+                (0, 0, 0, 0),
+                (0, 197, 255, 255),
+                (38, 115, 0, 255),
+                (163, 255, 115, 255),
+                (255, 170, 0, 255),
+                (156, 156, 156, 255),
+                (0, 0, 0, 255),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+                (0, 0, 0, 0),
+            ]
+        )
+        / 255
+    )
 
     prior_color_matrix = np.array(
         [
@@ -569,14 +582,6 @@ class ChesapeakeCVPR(GeoDataset):
         self.checksum = checksum
 
         self._verify()
-
-        lc_colors = np.zeros((max(self.lc_cmap.keys()) + 1, 4))
-        lc_colors[list(self.lc_cmap.keys())] = list(self.lc_cmap.values())
-        self._lc_cmap = ListedColormap(lc_colors[:, :3] / 255)
-
-        nlcd_colors = np.zeros((max(NLCD.cmap.keys()) + 1, 4))
-        nlcd_colors[list(NLCD.cmap.keys())] = list(NLCD.cmap.values())
-        self._nlcd_cmap = ListedColormap(nlcd_colors[:, :3] / 255)
 
         # Add all tiles into the index in epsg:3857 based on the included geojson
         mint = pd.Timestamp.min
@@ -773,14 +778,14 @@ class ChesapeakeCVPR(GeoDataset):
                 img = mask[:, :, 0]
                 mask = mask[:, :, 1:]
                 axs[i].imshow(
-                    img, vmin=0, vmax=95, cmap=self._nlcd_cmap, interpolation='none'
+                    img, vmin=0, vmax=255, cmap=NLCD.cmap, interpolation='none'
                 )
                 axs[i].axis('off')
             elif layer == 'lc':
                 img = mask[:, :, 0]
                 mask = mask[:, :, 1:]
                 axs[i].imshow(
-                    img, vmin=0, vmax=15, cmap=self._lc_cmap, interpolation='none'
+                    img, vmin=0, vmax=15, cmap=self.lc_cmap, interpolation='none'
                 )
                 axs[i].axis('off')
             elif layer == 'buildings':
@@ -803,7 +808,7 @@ class ChesapeakeCVPR(GeoDataset):
 
         if showing_predictions:
             axs[i].imshow(
-                predictions, vmin=0, vmax=15, cmap=self._lc_cmap, interpolation='none'
+                predictions, vmin=0, vmax=15, cmap=self.lc_cmap, interpolation='none'
             )
             axs[i].axis('off')
             if show_titles:
