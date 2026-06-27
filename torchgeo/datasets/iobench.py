@@ -55,7 +55,7 @@ class IOBench(IntersectionDataset):
         crs: CRS | None = None,
         res: float | tuple[float, float] | None = None,
         bands: Sequence[str] | None = [*Landsat9.default_bands, 'SR_QA_AEROSOL'],
-        classes: list[int] = [0],
+        classes: list[int] = list(CDL.valid_classes),
         transforms: Callable[[Sample], Sample] | None = None,
         cache: bool = True,
         download: bool = False,
