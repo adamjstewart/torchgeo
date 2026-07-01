@@ -550,7 +550,8 @@ class TestRasterDataset:
 
     def test_cmap(self) -> None:
         root = os.path.join('tests', 'data', 'cdl')
-        RasterDataset(root)
+        ds = RasterDataset(root)
+        assert ds.cmap is not None
 
 
 class TestXarrayDataset:
