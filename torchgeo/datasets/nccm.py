@@ -141,7 +141,10 @@ class NCCM(RasterDataset):
             IndexError: If *index* is not found in the dataset.
         """
         sample = super().__getitem__(index)
+
+        # Convert nodata class (15) to 4 so there are no gaps in our ordinal mapping
         sample['mask'][sample['mask'] == 15] = 4
+
         return sample
 
     def _verify(self) -> None:
