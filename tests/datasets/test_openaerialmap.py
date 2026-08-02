@@ -7,10 +7,13 @@ from pathlib import Path
 from typing import NotRequired, TypedDict
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
+import rasterio
 import requests
 import torch
 import torch.nn as nn
+from rasterio.crs import CRS
 from rasterio.errors import RasterioIOError
 
 from torchgeo.datasets import (
@@ -599,39 +602,29 @@ class TestOpenAerialMap:
 
         assert georef_called
 
+    # Tiles are ungeoreferenced until _georeference_tile writes the CRS and transform
+    @pytest.mark.filterwarnings('ignore::rasterio.errors.NotGeoreferencedWarning')
     def test_georeference_tile_success(
-        self, dataset: OpenAerialMap, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self, dataset: OpenAerialMap, tmp_path: Path
     ) -> None:
-        filepath = tmp_path / 'test.tif'
-        filepath.touch()
         tile = TileUtils.Tile(x=1, y=1, z=1)
-
-        update_tags_called = False
-
-        class MockDataset:
-            width = 256
-            height = 256
-            transform = 'mock_transform'
-            crs = 'mock_crs'
-
-            def update_tags(self, **kwargs: object) -> None:
-                nonlocal update_tags_called
-                update_tags_called = True
-
-        class MockContextManager:
-            def __enter__(self) -> MockDataset:
-                return MockDataset()
-
-            def __exit__(self, *args: object) -> None:
-                pass
-
-        monkeypatch.setattr(
-            'rasterio.open', lambda *args, **kwargs: MockContextManager()
-        )
+        filepath = tmp_path / f'OAM-{tile.x}-{tile.y}-{tile.z}.tif'
+        with rasterio.open(
+            filepath, 'w', driver='GTiff', width=256, height=256, count=3, dtype='uint8'
+        ) as src:
+            src.write(np.zeros((3, 256, 256), dtype='uint8'))
 
         dataset._georeference_tile(str(filepath), tile)
 
-        assert update_tags_called
+        bounds = TileUtils.bounds(tile)
+        with rasterio.open(filepath) as src:
+            assert src.crs == CRS.from_epsg(4326)
+            assert tuple(src.bounds) == pytest.approx(
+                (bounds.west, bounds.south, bounds.east, bounds.north)
+            )
+            tags = src.tags(ns='rio_georeference')
+            assert tags['georeferencing_applied'] == 'True'
+            assert tags['tile_x'] == str(tile.x)
 
     def test_download_single_tile_failures(
         self, dataset: OpenAerialMap, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
